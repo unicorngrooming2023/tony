@@ -234,6 +234,11 @@
     }
     .gallery-img:hover { transform: scale(1.03); box-shadow: 0 6px 24px var(--shadow); }
     .gallery-empty { grid-column: 1/-1; text-align: center; color: var(--mid); font-style: italic; padding: 2rem; }
+    .gallery-pagination { display: flex; align-items: center; justify-content: center; gap: 1rem; margin: 1.5rem 0 2rem; }
+    .gallery-pagination button { background: var(--gold); color: #fff; border: none; border-radius: 8px; padding: 0.5rem 1.4rem; font-size: 0.95rem; cursor: pointer; transition: background 0.2s; }
+    .gallery-pagination button:disabled { background: var(--mid); cursor: default; opacity: 0.5; }
+    .gallery-pagination button:not(:disabled):hover { background: var(--amber); }
+    .gallery-page-info { color: var(--brown); font-size: 0.9rem; min-width: 80px; text-align: center; }
 
     .upload-box {
       border: 2.5px dashed var(--gold);
@@ -484,6 +489,11 @@
     <div class="gallery-grid" id="gallery-grid">
       <p class="gallery-empty">Loading photos…</p>
     </div>
+    <div class="gallery-pagination" id="gallery-pagination" style="display:none">
+      <button id="gallery-prev" onclick="galleryChangePage(-1)">← Prev</button>
+      <span class="gallery-page-info" id="gallery-page-info"></span>
+      <button id="gallery-next" onclick="galleryChangePage(1)">Next →</button>
+    </div>
     <div class="upload-box" onclick="document.getElementById('gallery-file').click()">
       <div class="upload-box-icon">📷</div>
       <p>Click to share a photo of Anthony</p>
@@ -616,33 +626,55 @@
   }
 
   // ── Gallery ──────────────────────────────────────────────────────────────
-  const renderedPhotos = new Set()
+  const PHOTOS_PER_PAGE = 16
+  let allPhotos = []
+  let galleryPage = 1
 
   async function loadGallery() {
     const { data, error } = await db.from('gallery_photos').select('*').order('created_at', { ascending: false })
     const grid = document.getElementById('gallery-grid')
     if (error || !data || !data.length) {
       grid.innerHTML = '<p class="gallery-empty">No photos yet — be the first to share one!</p>'
+      document.getElementById('gallery-pagination').style.display = 'none'
       return
     }
+    allPhotos = data
+    galleryPage = 1
+    renderGalleryPage()
+  }
+
+  function renderGalleryPage() {
+    const grid = document.getElementById('gallery-grid')
+    const pagination = document.getElementById('gallery-pagination')
+    const totalPages = Math.ceil(allPhotos.length / PHOTOS_PER_PAGE)
+    const start = (galleryPage - 1) * PHOTOS_PER_PAGE
+    const pagePhotos = allPhotos.slice(start, start + PHOTOS_PER_PAGE)
     grid.innerHTML = ''
-    data.forEach(p => addGalleryPhoto(p.url, p.id))
+    pagePhotos.forEach(p => {
+      const img = document.createElement('img')
+      img.src = p.url
+      img.className = 'gallery-img'
+      img.alt = 'Memory of Anthony'
+      img.onclick = () => openLightbox(p.url)
+      grid.appendChild(img)
+    })
+    pagination.style.display = totalPages > 1 ? 'flex' : 'none'
+    document.getElementById('gallery-prev').disabled = galleryPage === 1
+    document.getElementById('gallery-next').disabled = galleryPage === totalPages
+    document.getElementById('gallery-page-info').textContent = `Page ${galleryPage} of ${totalPages}`
+  }
+
+  function galleryChangePage(dir) {
+    galleryPage += dir
+    renderGalleryPage()
+    document.getElementById('gallery').scrollIntoView({ behavior: 'smooth' })
   }
 
   function addGalleryPhoto(url, id) {
-    if (id && renderedPhotos.has(id)) return
-    if (id) renderedPhotos.add(id)
-
-    const grid = document.getElementById('gallery-grid')
-    const empty = grid.querySelector('.gallery-empty')
-    if (empty) empty.remove()
-
-    const img = document.createElement('img')
-    img.src = url
-    img.className = 'gallery-img'
-    img.alt = 'Memory of Anthony'
-    img.onclick = () => openLightbox(url)
-    grid.insertBefore(img, grid.firstChild)
+    if (allPhotos.find(p => p.id === id)) return
+    allPhotos.unshift({ url, id })
+    galleryPage = 1
+    renderGalleryPage()
   }
 
   async function uploadGalleryPhoto(input) {
