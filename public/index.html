@@ -946,13 +946,14 @@
     }
     list.innerHTML = comments.map(c => {
       const liked = localStorage.getItem('comment_liked_' + c.id) === '1'
-      const count = parseInt(localStorage.getItem('comment_likes_count_' + c.id) || c.likes || 0)
+      // Use the real DB count (shared across all visitors)
+      const count = parseInt(c.likes || 0)
       return `
         <div class="lightbox-comment-item">
           <strong>${escHtml(c.name)}</strong>
           ${escHtml(c.comment)}
           <div class="comment-footer">
-            <button class="comment-heart-btn ${liked ? 'liked' : ''}" data-comment-id="${c.id}">
+            <button class="comment-heart-btn ${liked ? 'liked' : ''}" data-comment-id="${c.id}" data-likes="${count}">
               <span class="cheart">${liked ? '♥' : '♡'}</span>
               <span class="comment-like-count">${count}</span>
             </button>
@@ -962,25 +963,30 @@
 
     // Attach click handlers after rendering
     list.querySelectorAll('.comment-heart-btn').forEach(btn => {
-      btn.addEventListener('click', function(e) {
+      btn.addEventListener('click', async function(e) {
         e.stopPropagation()
         const cid = this.dataset.commentId
         const likedKey = 'comment_liked_' + cid
-        const countKey = 'comment_likes_count_' + cid
         if (localStorage.getItem(likedKey) === '1') {
           this.style.transform = 'scale(1.15)'
           setTimeout(() => this.style.transform = '', 150)
           return
         }
+        // Mark liked locally so this person can't double-like
         localStorage.setItem(likedKey, '1')
-        const newCount = (parseInt(localStorage.getItem(countKey) || 0)) + 1
-        localStorage.setItem(countKey, newCount)
         this.classList.add('liked')
         this.querySelector('.cheart').textContent = '♥'
+        // Optimistic update
+        const currentCount = parseInt(this.dataset.likes || 0)
+        const newCount = currentCount + 1
+        this.dataset.likes = newCount
         this.querySelector('.comment-like-count').textContent = newCount
         this.style.transform = 'scale(1.25)'
         setTimeout(() => this.style.transform = '', 200)
-        try { db.rpc('increment_comment_likes', { comment_id: cid }) } catch(e) {}
+        // Save to Supabase so ALL visitors see the updated count
+        try {
+          await db.rpc('increment_comment_likes', { comment_id: parseInt(cid) })
+        } catch(e) {}
       })
     })
 
