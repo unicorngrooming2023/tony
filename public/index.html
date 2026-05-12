@@ -766,9 +766,9 @@
       const headers = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json' }
 
       // Count this as a new visit if not seen in this browser session
-      const isNew = !sessionStorage.getItem('tony_visited')
+      const isNew = !sessionStorage.getItem('anthony_visited')
       if (isNew) {
-        sessionStorage.setItem('tony_visited', '1')
+        sessionStorage.setItem('anthony_visited', '1')
         // Increment counter via RPC
         await fetch(SUPA_URL + '/rest/v1/rpc/increment_visitors', {
           method: 'POST', headers, body: '{}'
