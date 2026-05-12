@@ -806,26 +806,25 @@
 </script>
 <script>
   (async function() {
-    try {
-      const SUPA_URL = 'https://vaxpikbcngfpmmhygktp.supabase.co'
-      const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZheHBpa2JjbmdmcG1taHlna3RwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0OTk4ODcsImV4cCI6MjA2MjA3NTg4N30.qhOPuTpCPQUJBqvFAQq3HuW4LPbC0MSdNg80U5OPnqs'
-      const headers = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json' }
+    // Wait for db to be ready
+    await new Promise(r => setTimeout(r, 800))
 
-      // Count this as a new visit if not seen in this browser session
+    // Increment if new session (don't let this block the count display)
+    try {
       const isNew = !sessionStorage.getItem('anthony_visited')
       if (isNew) {
         sessionStorage.setItem('anthony_visited', '1')
-        // Increment counter via RPC
-        await fetch(SUPA_URL + '/rest/v1/rpc/increment_visitors', {
-          method: 'POST', headers, body: '{}'
-        })
+        await db.rpc('increment_visitors')
       }
+    } catch(e) { /* silently skip if function missing */ }
 
-      // Always fetch and display the current count
-      const res = await fetch(SUPA_URL + '/rest/v1/site_stats?id=eq.1&select=visitors', { headers })
-      const data = await res.json()
-      if (data && data[0]) {
-        document.getElementById('visitor-count').textContent = data[0].visitors.toLocaleString()
+    // Always try to show the count
+    try {
+      const { data, error } = await db.from('site_stats').select('visitors').eq('id', 1).single()
+      if (!error && data) {
+        document.getElementById('visitor-count').textContent = Number(data.visitors).toLocaleString()
+      } else {
+        document.getElementById('visitor-count').textContent = '—'
       }
     } catch(e) {
       document.getElementById('visitor-count').textContent = '—'
