@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anthony William Detter — Celebrating a Life Well Lived</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold:       #C8922A;
+      --gold-light: #F0C060;
+      --gold-pale:  #FDF3DC;
+      --amber:      #E07820;
+      --cream:      #FFFBF2;
+      --brown:      #3A200A;
+      --mid:        #7A4A20;
+      --white:      #ffffff;
+      --shadow:     rgba(80,40,0,0.13);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--cream);
+      color: var(--brown);
+      min-height: 100vh;
+    }
+
+    /* ── NAV ───────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,251,242,0.95);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--gold-light);
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      padding: 0.75rem 1.5rem;
+    }
+    nav a {
+      text-decoration: none;
+      color: var(--mid);
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--gold); }
+
+    /* ── HERO ──────────────────────────────────── */
+    .hero {
+      background: linear-gradient(160deg, #F5C842 0%, #E8851A 55%, #C05A10 100%);
+      padding: 4rem 1.5rem 5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    .portrait-ring {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      border: 5px solid rgba(255,255,255,0.7);
+      box-shadow: 0 0 0 8px rgba(255,255,255,0.25), 0 8px 40px rgba(0,0,0,0.3);
+      overflow: hidden;
+      margin: 0 auto 1.8rem;
+      background: rgba(255,255,255,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .portrait-ring img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+    .portrait-placeholder { font-size: 5rem; opacity: 0.5; }
+
+    .hero-tag {
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      font-size: 0.9rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 0.6rem;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      color: #fff;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.25);
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+    .hero-dates {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.25rem;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 1.5rem;
+    }
+    .hero-quote {
+      max-width: 520px;
+      margin: 0 auto;
+      font-size: 1rem;
+      color: rgba(255,255,255,0.88);
+      line-height: 1.7;
+      font-style: italic;
+    }
+
+    /* ── SECTION WRAPPER ───────────────────────── */
+    section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--gold);
+      text-align: center;
+      margin-bottom: 0.4rem;
+    }
+    .section-rule {
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold-light), var(--amber));
+      border-radius: 99px;
+      margin: 0 auto 2.5rem;
+    }
+
+    /* ── TRIBUTE ───────────────────────────────── */
+    .tribute-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 4px 24px var(--shadow);
+      border-left: 5px solid var(--gold);
+      font-size: 1.05rem;
+      line-height: 1.85;
+      color: var(--brown);
+    }
+    .tribute-card p + p { margin-top: 1rem; }
+
+    /* ── CANDLE ────────────────────────────────── */
+    #candles {
+      background: linear-gradient(180deg, #2D1810 0%, #1A0D08 100%);
+      max-width: 100%;
+      padding: 4rem 1.5rem;
+      text-align: center;
+    }
+    #candles .section-title { color: var(--gold-light); }
+    #candles .section-rule { background: linear-gradient(90deg, var(--gold-light), #fff8); }
+    .candle-desc { color: rgba(255,255,255,0.7); margin-bottom: 2.5rem; font-size: 1rem; }
+
+    .candles-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      min-height: 80px;
+    }
+    .candle-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 0.5s ease;
+    }
+    .candle-flame {
+      font-size: 2.2rem;
+      animation: flicker 2s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 8px #FFAA00);
+    }
+    @keyframes flicker {
+      0%   { transform: scaleX(1) scaleY(1) rotate(-1deg); opacity: 0.9; }
+      100% { transform: scaleX(0.92) scaleY(1.08) rotate(1deg); opacity: 1; }
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    .btn-candle {
+      background: linear-gradient(135deg, #F5C842, #E8851A);
+      border: none;
+      color: var(--brown);
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 0.85rem 2.5rem;
+      border-radius: 999px;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      box-shadow: 0 4px 20px rgba(240,140,0,0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-candle:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(240,140,0,0.55); }
+    .btn-candle:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .candle-total { margin-top: 1rem; color: rgba(255,255,255,0.5); font-size: 0.9rem; }
+
+    /* ── GALLERY ───────────────────────────────── */
+    #gallery { background: var(--gold-pale); max-width: 100%; padding: 4rem 1.5rem; }
+    .gallery-inner { max-width: 900px; margin: 0 auto; }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .gallery-img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 3px 14px var(--shadow);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .gallery-img:hover { transform: scale(1.03); box-shadow: 0 6px 24px var(--shadow); }
+    .gallery-empty { grid-column: 1/-1; text-align: center; color: var(--mid); font-style: italic; padding: 2rem; }
+
+    .upload-box {
+      border: 2.5px dashed var(--gold);
+      border-radius: 14px;
+      padding: 2rem;
+      text-align: center;
+      background: rgba(255,255,255,0.6);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .upload-box:hover { background: rgba(255,255,255,0.9); }
+    .upload-box input[type=file] { display: none; }
+    .upload-box-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .upload-box p { color: var(--mid); font-size: 0.95rem; }
+    .btn-upload {
+      margin-top: 1rem;
+      background: var(--gold);
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1.8rem;
+      border-radius: 999px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+    .btn-upload:hover { background: var(--amber); }
+
+    /* ── MESSAGES ──────────────────────────────── */
+    .message-form {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px var(--shadow);
+      margin-bottom: 2.5rem;
+    }
+    .form-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 200px; }
+    .form-group label { font-weight: 700; font-size: 0.85rem; color: var(--mid); letter-spacing: 0.04em; text-transform: uppercase; }
+    .form-group input,
+    .form-group textarea {
+      border: 1.5px solid #E8D5A8;
+      border-radius: 8px;
+      padding: 0.65rem 0.9rem;
+      font-family: 'Lato', sans-serif;
+      font-size: 1rem;
+      color: var(--brown);
+      background: var(--gold-pale);
+      transition: border-color 0.2s;
+      resize: vertical;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus { outline: none; border-color: var(--gold); background: #fff; }
+
+    .btn-submit {
+      margin-top: 1rem;
+      background: linear-gradient(135deg, #F5C842, #E8851A);
+      border: none;
+      color: var(--brown);
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 0.75rem 2.5rem;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 3px 14px rgba(240,150,0,0.35);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(240,150,0,0.5); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .message-cards { display: flex; flex-direction: column; gap: 1.2rem; }
+    .message-card {
+      background: var(--white);
+      border-radius: 14px;
+      padding: 1.5rem;
+      box-shadow: 0 3px 16px var(--shadow);
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      animation: fadeIn 0.4s ease;
+    }
+    .msg-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold-light), var(--amber));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--brown);
+      flex-shrink: 0;
+    }
+    .msg-body { flex: 1; }
+    .msg-name { font-weight: 700; color: var(--gold); margin-bottom: 0.2rem; }
+    .msg-text { color: var(--brown); line-height: 1.65; font-size: 0.97rem; }
+    .msg-date { font-size: 0.78rem; color: #AAA; margin-top: 0.4rem; }
+    .msg-photo { margin-top: 0.6rem; }
+    .msg-photo img { max-width: 180px; border-radius: 8px; cursor: pointer; }
+    .no-messages { text-align: center; color: var(--mid); font-style: italic; padding: 2rem; }
+
+    /* ── LIVE BADGE ─────────────────────────────── */
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.8);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      margin-bottom: 1rem;
+    }
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #4ADE80;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* ── FOOTER ────────────────────────────────── */
+    footer {
+      background: var(--brown);
+      color: rgba(255,255,255,0.6);
+      text-align: center;
+      padding: 2rem 1.5rem;
+      font-size: 0.85rem;
+    }
+    footer strong { color: var(--gold-light); }
+
+    /* ── LIGHTBOX ──────────────────────────────── */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; box-shadow: 0 8px 60px rgba(0,0,0,0.8); }
+    .lightbox-close { position: absolute; top: 1.2rem; right: 1.5rem; font-size: 2rem; color: white; cursor: pointer; user-select: none; }
+
+    /* ── TOAST ─────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--brown);
+      color: var(--gold-light);
+      padding: 0.75rem 1.8rem;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+      transition: transform 0.35s ease;
+      z-index: 500;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 600px) {
+      .form-row { flex-direction: column; }
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+      nav { gap: 1rem; font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="#tribute">Tribute</a>
+  <a href="#candles">Light a Candle</a>
+  <a href="#gallery">Gallery</a>
+  <a href="#messages">Memories</a>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="portrait-ring">
+    <img id="portrait-img" src="portrait.jpg" alt="Anthony William Detter"
+         onerror="this.style.display='none';document.getElementById('portrait-fallback').style.display='block'" />
+    <span id="portrait-fallback" class="portrait-placeholder" style="display:none">🌟</span>
+  </div>
+  <p class="hero-tag">Celebrating the Life of</p>
+  <h1>Anthony William Detter</h1>
+  <p class="hero-dates">1967 &ndash; 2026</p>
+  <p class="hero-quote">
+    "Those we love don't go away — they walk beside us every day,
+    unseen, unheard, but always near, still loved, still missed, still very dear."
+  </p>
+</header>
+
+<!-- TRIBUTE -->
+<section id="tribute">
+  <h2 class="section-title">A Life to Celebrate</h2>
+  <div class="section-rule"></div>
+  <div class="tribute-card">
+    <p>
+      Anthony William Detter was born in 1967 and lived a life full of warmth, laughter,
+      and an enduring love for the people around him. He carried himself with a quiet strength
+      that drew others in, and left a mark on every life he touched.
+    </p>
+    <p>
+      To those who knew him, Anthony was more than a friend — he was a constant, a steady
+      presence in the good times and the hard ones. His generosity, his humor, and his heart
+      made the world a richer place.
+    </p>
+    <p>
+      Though he left us too soon in 2026, the memories he made live on in all of us.
+      This page is a place to remember him, share the moments we cherish, and keep his
+      spirit alive together.
+    </p>
+    <p style="font-style:italic; color: var(--mid); margin-top:1.5rem;">
+      — Share your own memories of Anthony in the section below.
+    </p>
+  </div>
+</section>
+
+<!-- CANDLES -->
+<div id="candles">
+  <div class="live-badge"><span class="live-dot"></span> Live</div>
+  <h2 class="section-title">Light a Candle</h2>
+  <div class="section-rule"></div>
+  <p class="candle-desc">Light a virtual candle in Anthony's memory. Each flame joins the others in real time.</p>
+  <div class="candles-grid" id="candle-grid"></div>
+  <button class="btn-candle" id="candle-btn" onclick="lightCandle()">🕯️ Light a Candle</button>
+  <p class="candle-total" id="candle-total">Loading…</p>
+</div>
+
+<!-- GALLERY -->
+<div id="gallery">
+  <div class="gallery-inner">
+    <h2 class="section-title">Photo Gallery</h2>
+    <div class="section-rule"></div>
+    <div class="gallery-grid" id="gallery-grid">
+      <p class="gallery-empty">Loading photos…</p>
+    </div>
+    <div class="upload-box" onclick="document.getElementById('gallery-file').click()">
+      <div class="upload-box-icon">📷</div>
+      <p>Click to share a photo of Anthony</p>
+      <p style="font-size:0.82rem; margin-top:0.3rem; color:#AAA;">JPG, PNG or GIF · up to 20 MB</p>
+      <input type="file" id="gallery-file" accept="image/*" onchange="uploadGalleryPhoto(this)" />
+      <div><button class="btn-upload" onclick="event.stopPropagation(); document.getElementById('gallery-file').click()">Choose Photo</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MESSAGES -->
+<section id="messages">
+  <div style="text-align:center; margin-bottom:-1.5rem;">
+    <div class="live-badge" style="background: var(--gold-pale); color: var(--mid);"><span class="live-dot"></span> Live updates</div>
+  </div>
+  <h2 class="section-title">Share a Memory</h2>
+  <div class="section-rule"></div>
+
+  <div class="message-form">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="msg-name">Your Name</label>
+        <input id="msg-name" type="text" placeholder="e.g. Sarah Johnson" maxlength="80" />
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:1rem;">
+      <label for="msg-text">Your Message</label>
+      <textarea id="msg-text" rows="4" placeholder="Share a memory, a kind word, or something Anthony meant to you…" maxlength="1000"></textarea>
+    </div>
+    <div class="form-group" style="margin-top:1rem;">
+      <label>Attach a Photo (optional)</label>
+      <input type="file" id="msg-photo" accept="image/*" style="padding:0.4rem; background:#fff;" />
+    </div>
+    <button class="btn-submit" id="submit-btn" onclick="submitMessage()">💛 Post Your Memory</button>
+  </div>
+
+  <div class="message-cards" id="message-list">
+    <p class="no-messages">Loading memories…</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>In loving memory of <strong>Anthony William Detter</strong> · 1967–2026</p>
+  <p style="margin-top:0.4rem;">Forever in our hearts.</p>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <span class="lightbox-close">&times;</span>
+  <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()" />
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Supabase Setup ──────────────────────────────────────────────────────
+  const SUPABASE_URL = 'https://kseotxvxpfiydywlcbrw.supabase.co'
+  const SUPABASE_KEY = 'sb_publishable_KZ4Z1EGT-1EZySnSsV6d9Q_tryq0GjE'
+  const { createClient } = supabase
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY)
+  const BUCKET = 'memorial-photos'
+
+  // ── Helpers ─────────────────────────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('toast')
+    t.textContent = msg
+    t.classList.add('show')
+    clearTimeout(t._timer)
+    t._timer = setTimeout(() => t.classList.remove('show'), 3200)
+  }
+
+  function openLightbox(src) {
+    document.getElementById('lightbox-img').src = src
+    document.getElementById('lightbox').classList.add('open')
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open')
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox() })
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+              .replace(/"/g,'&quot;').replace(/'/g,'&#039;')
+  }
+
+  async function uploadToStorage(file, folder) {
+    const ext = file.name.split('.').pop().toLowerCase()
+    const filename = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+    const { error } = await db.storage.from(BUCKET).upload(filename, file, {
+      contentType: file.type,
+      upsert: false
+    })
+    if (error) throw error
+    return db.storage.from(BUCKET).getPublicUrl(filename).data.publicUrl
+  }
+
+  // ── Candles ──────────────────────────────────────────────────────────────
+  async function loadCandles() {
+    const { data } = await db.from('candles').select('count').eq('id', 1).single()
+    if (data) renderCandles(data.count)
+  }
+
+  function renderCandles(count) {
+    const grid = document.getElementById('candle-grid')
+    grid.innerHTML = ''
+    const display = Math.min(count, 40)
+    for (let i = 0; i < display; i++) {
+      const div = document.createElement('div')
+      div.className = 'candle-item'
+      div.style.animationDelay = `${(i * 0.04).toFixed(2)}s`
+      div.innerHTML = `<span class="candle-flame">🕯️</span>`
+      grid.appendChild(div)
+    }
+    const extra = count > 40 ? ` + ${count - 40} more` : ''
+    document.getElementById('candle-total').textContent =
+      count === 0
+        ? 'Be the first to light a candle.'
+        : `${count.toLocaleString()} candle${count !== 1 ? 's' : ''} lit${extra}`
+  }
+
+  async function lightCandle() {
+    const btn = document.getElementById('candle-btn')
+    btn.disabled = true
+    const { error } = await db.rpc('increment_candles')
+    if (error) { showToast('Something went wrong. Please try again.'); btn.disabled = false; return }
+    showToast('🕯️ Your candle is lit — thank you.')
+    setTimeout(() => btn.disabled = false, 2000)
+  }
+
+  // ── Gallery ──────────────────────────────────────────────────────────────
+  const renderedPhotos = new Set()
+
+  async function loadGallery() {
+    const { data, error } = await db.from('gallery_photos').select('*').order('created_at', { ascending: false })
+    const grid = document.getElementById('gallery-grid')
+    if (error || !data || !data.length) {
+      grid.innerHTML = '<p class="gallery-empty">No photos yet — be the first to share one!</p>'
+      return
+    }
+    grid.innerHTML = ''
+    data.forEach(p => addGalleryPhoto(p.url, p.id))
+  }
+
+  function addGalleryPhoto(url, id) {
+    if (id && renderedPhotos.has(id)) return
+    if (id) renderedPhotos.add(id)
+
+    const grid = document.getElementById('gallery-grid')
+    const empty = grid.querySelector('.gallery-empty')
+    if (empty) empty.remove()
+
+    const img = document.createElement('img')
+    img.src = url
+    img.className = 'gallery-img'
+    img.alt = 'Memory of Anthony'
+    img.onclick = () => openLightbox(url)
+    grid.insertBefore(img, grid.firstChild)
+  }
+
+  async function uploadGalleryPhoto(input) {
+    if (!input.files[0]) return
+    showToast('Uploading photo…')
+    try {
+      const url = await uploadToStorage(input.files[0], 'gallery')
+      const { data, error } = await db.from('gallery_photos').insert({ url }).select().single()
+      if (error) throw error
+      addGalleryPhoto(data.url, data.id)
+      showToast('📷 Photo added to the gallery!')
+    } catch (e) {
+      showToast('Upload failed — please try again.')
+    }
+    input.value = ''
+  }
+
+  // ── Messages ─────────────────────────────────────────────────────────────
+  const renderedMessages = new Set()
+
+  async function loadMessages() {
+    const { data, error } = await db.from('messages').select('*').order('created_at', { ascending: false })
+    const list = document.getElementById('message-list')
+    if (error || !data || !data.length) {
+      list.innerHTML = '<p class="no-messages">No memories shared yet — be the first!</p>'
+      return
+    }
+    list.innerHTML = ''
+    data.forEach(renderMessage)
+  }
+
+  function renderMessage(m) {
+    if (renderedMessages.has(m.id)) return
+    renderedMessages.add(m.id)
+
+    const list = document.getElementById('message-list')
+    const empty = list.querySelector('.no-messages')
+    if (empty) empty.remove()
+
+    const initials = m.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase()
+    const date = new Date(m.created_at).toLocaleDateString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric'
+    })
+
+    const card = document.createElement('div')
+    card.className = 'message-card'
+    card.dataset.msgId = m.id
+    card.innerHTML = `
+      <div class="msg-avatar">${escHtml(initials)}</div>
+      <div class="msg-body">
+        <div class="msg-name">${escHtml(m.name)}</div>
+        <div class="msg-text">${escHtml(m.message)}</div>
+        ${m.photo_url ? `<div class="msg-photo"><img src="${escHtml(m.photo_url)}" alt="shared photo" onclick="openLightbox('${escHtml(m.photo_url)}')" /></div>` : ''}
+        <div class="msg-date">${date}</div>
+      </div>
+    `
+    list.insertBefore(card, list.firstChild)
+  }
+
+  async function submitMessage() {
+    const name    = document.getElementById('msg-name').value.trim()
+    const message = document.getElementById('msg-text').value.trim()
+    const photoIn = document.getElementById('msg-photo')
+    const btn     = document.getElementById('submit-btn')
+
+    if (!name)    { showToast('Please enter your name.'); return }
+    if (!message) { showToast('Please write a message.'); return }
+
+    btn.disabled = true
+    btn.textContent = 'Posting…'
+
+    let photo_url = null
+    if (photoIn.files[0]) {
+      try { photo_url = await uploadToStorage(photoIn.files[0], 'messages') }
+      catch { showToast('Photo upload failed — posting without photo.') }
+    }
+
+    const { data, error } = await db.from('messages').insert({ name, message, photo_url }).select().single()
+
+    btn.disabled = false
+    btn.textContent = '💛 Post Your Memory'
+
+    if (error) { showToast('Could not post — please try again.'); return }
+
+    renderMessage(data)
+    document.getElementById('msg-name').value = ''
+    document.getElementById('msg-text').value = ''
+    photoIn.value = ''
+    showToast('💛 Your memory has been shared.')
+  }
+
+  // ── Real-time subscriptions ──────────────────────────────────────────────
+  db.channel('memorial-live')
+    .on('postgres_changes', {
+      event: 'INSERT', schema: 'public', table: 'messages'
+    }, ({ new: m }) => renderMessage(m))
+    .on('postgres_changes', {
+      event: 'UPDATE', schema: 'public', table: 'candles'
+    }, ({ new: c }) => renderCandles(c.count))
+    .on('postgres_changes', {
+      event: 'INSERT', schema: 'public', table: 'gallery_photos'
+    }, ({ new: p }) => addGalleryPhoto(p.url, p.id))
+    .subscribe()
+
+  // ── Init ────────────────────────────────────────────────────────────────
+  loadCandles()
+  loadGallery()
+  loadMessages()
+</script>
+</body>
+</html>
