@@ -202,101 +202,34 @@
       display: flex;
       justify-content: center;
       align-items: flex-end;
-      gap: 18px;
+      gap: 10px;
       margin: 0 auto 1.6rem;
-      height: 80px;
     }
-    .p-candle {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .p-candle-flame-wrap {
-      position: relative;
-      width: 14px;
-      height: 32px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-    }
-    /* outer glow */
-    .p-candle-flame-wrap::before {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 22px;
-      height: 38px;
-      background: radial-gradient(ellipse at 50% 70%, rgba(255,200,60,0.35) 0%, transparent 70%);
-      border-radius: 50% 50% 30% 30%;
-      animation: flicker-glow 1.8s ease-in-out infinite alternate;
-    }
-    .p-candle-flame {
-      position: relative;
-      width: 10px;
-      height: 26px;
-      background: linear-gradient(to top, #FFDD00 0%, #FF9500 45%, #FF5500 75%, rgba(255,80,0,0.1) 100%);
-      border-radius: 50% 50% 35% 35% / 60% 60% 40% 40%;
+    .pc-item {
+      font-size: 2.4rem;
+      filter: drop-shadow(0 0 10px #FFAA00) drop-shadow(0 0 20px rgba(255,140,0,0.5));
       transform-origin: bottom center;
-      animation: flicker-flame 1.8s ease-in-out infinite alternate;
-      box-shadow: 0 0 8px 2px rgba(255,160,0,0.6), 0 0 18px 4px rgba(255,100,0,0.25);
+      animation: pc-flicker 2s ease-in-out infinite alternate;
+      display: inline-block;
     }
-    /* inner bright core */
-    .p-candle-flame::after {
-      content: '';
-      position: absolute;
-      bottom: 3px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 4px;
-      height: 14px;
-      background: linear-gradient(to top, #fff8b0, rgba(255,255,200,0.4));
-      border-radius: 50% 50% 40% 40%;
-    }
-    .p-candle-wick {
-      width: 2px;
-      height: 5px;
-      background: #444;
-      border-radius: 1px;
-      margin-bottom: 0;
-    }
-    .p-candle-body {
-      width: 12px;
-      height: 36px;
-      border-radius: 3px 3px 2px 2px;
-      background: linear-gradient(to bottom, #fff8e8 0%, #f0d890 50%, #d4a840 100%);
-      box-shadow: inset -2px 0 4px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.3);
-    }
-    .p-candle-base {
-      width: 16px;
-      height: 5px;
-      background: linear-gradient(to bottom, #c8922a, #8a5a10);
-      border-radius: 0 0 3px 3px;
-    }
-    /* stagger animations per candle */
-    .p-candle:nth-child(1) .p-candle-flame,
-    .p-candle:nth-child(1) .p-candle-flame-wrap::before { animation-delay: 0s; animation-duration: 1.9s; }
-    .p-candle:nth-child(2) .p-candle-flame,
-    .p-candle:nth-child(2) .p-candle-flame-wrap::before { animation-delay: -0.6s; animation-duration: 2.1s; }
-    .p-candle:nth-child(3) .p-candle-flame,
-    .p-candle:nth-child(3) .p-candle-flame-wrap::before { animation-delay: -1.1s; animation-duration: 1.7s; }
-    .p-candle:nth-child(4) .p-candle-flame,
-    .p-candle:nth-child(4) .p-candle-flame-wrap::before { animation-delay: -0.3s; animation-duration: 2.3s; }
-    .p-candle:nth-child(5) .p-candle-flame,
-    .p-candle:nth-child(5) .p-candle-flame-wrap::before { animation-delay: -0.9s; animation-duration: 1.6s; }
+    /* stagger each candle so they never move together */
+    .pc-item:nth-child(1) { animation-duration: 1.85s; animation-delay:  0s;    font-size: 2.2rem; }
+    .pc-item:nth-child(2) { animation-duration: 2.10s; animation-delay: -0.6s;  font-size: 2.5rem; }
+    .pc-item:nth-child(3) { animation-duration: 1.70s; animation-delay: -1.1s;  font-size: 2.8rem; } /* tallest center */
+    .pc-item:nth-child(4) { animation-duration: 2.30s; animation-delay: -0.35s; font-size: 2.5rem; }
+    .pc-item:nth-child(5) { animation-duration: 1.95s; animation-delay: -0.9s;  font-size: 2.2rem; }
 
-    @keyframes flicker-flame {
-      0%   { transform: scaleX(1)    scaleY(1)    rotate(-1.5deg) skewX(0deg);  opacity: 0.95; }
-      25%  { transform: scaleX(0.88) scaleY(1.06) rotate(1deg)   skewX(-2deg); opacity: 1;    }
-      50%  { transform: scaleX(1.05) scaleY(0.95) rotate(-0.5deg) skewX(1deg); opacity: 0.92; }
-      75%  { transform: scaleX(0.92) scaleY(1.08) rotate(1.5deg) skewX(2deg);  opacity: 1;    }
-      100% { transform: scaleX(0.96) scaleY(1.04) rotate(-1deg)  skewX(-1deg); opacity: 0.97; }
-    }
-    @keyframes flicker-glow {
-      0%   { opacity: 0.6; transform: translateX(-50%) scale(1);    }
-      50%  { opacity: 0.9; transform: translateX(-50%) scale(1.12); }
-      100% { opacity: 0.5; transform: translateX(-50%) scale(0.95); }
+    @keyframes pc-flicker {
+      0%   { transform: scaleX(1)    scaleY(1)    rotate(-2deg);
+             filter: drop-shadow(0 0 8px #FFAA00) drop-shadow(0 0 16px rgba(255,120,0,0.45)); }
+      20%  { transform: scaleX(0.90) scaleY(1.07) rotate(1.5deg);
+             filter: drop-shadow(0 0 14px #FFB800) drop-shadow(0 0 26px rgba(255,140,0,0.7)); }
+      45%  { transform: scaleX(1.06) scaleY(0.94) rotate(-1deg);
+             filter: drop-shadow(0 0 6px #FF9500) drop-shadow(0 0 12px rgba(255,100,0,0.35)); }
+      70%  { transform: scaleX(0.93) scaleY(1.09) rotate(2deg);
+             filter: drop-shadow(0 0 16px #FFCC00) drop-shadow(0 0 28px rgba(255,160,0,0.75)); }
+      100% { transform: scaleX(0.97) scaleY(1.03) rotate(-1.5deg);
+             filter: drop-shadow(0 0 10px #FFAA00) drop-shadow(0 0 20px rgba(255,130,0,0.55)); }
     }
 
     .btn-candle {
@@ -610,41 +543,11 @@
   </div>
   <!-- Animated candles beneath portrait -->
   <div class="portrait-candles">
-    <!-- candle 1 -->
-    <div class="p-candle">
-      <div class="p-candle-flame-wrap"><div class="p-candle-flame"></div></div>
-      <div class="p-candle-wick"></div>
-      <div class="p-candle-body"></div>
-      <div class="p-candle-base"></div>
-    </div>
-    <!-- candle 2 -->
-    <div class="p-candle">
-      <div class="p-candle-flame-wrap"><div class="p-candle-flame"></div></div>
-      <div class="p-candle-wick"></div>
-      <div class="p-candle-body"></div>
-      <div class="p-candle-base"></div>
-    </div>
-    <!-- candle 3 (center, taller) -->
-    <div class="p-candle" style="--body-h:52px">
-      <div class="p-candle-flame-wrap"><div class="p-candle-flame"></div></div>
-      <div class="p-candle-wick"></div>
-      <div class="p-candle-body" style="height:52px"></div>
-      <div class="p-candle-base"></div>
-    </div>
-    <!-- candle 4 -->
-    <div class="p-candle">
-      <div class="p-candle-flame-wrap"><div class="p-candle-flame"></div></div>
-      <div class="p-candle-wick"></div>
-      <div class="p-candle-body"></div>
-      <div class="p-candle-base"></div>
-    </div>
-    <!-- candle 5 -->
-    <div class="p-candle">
-      <div class="p-candle-flame-wrap"><div class="p-candle-flame"></div></div>
-      <div class="p-candle-wick"></div>
-      <div class="p-candle-body"></div>
-      <div class="p-candle-base"></div>
-    </div>
+    <span class="pc-item">🕯️</span>
+    <span class="pc-item">🕯️</span>
+    <span class="pc-item">🕯️</span>
+    <span class="pc-item">🕯️</span>
+    <span class="pc-item">🕯️</span>
   </div>
   <p class="hero-tag">Celebrating the Life of</p>
   <h1>Anthony William Detter</h1>
