@@ -224,16 +224,42 @@
       gap: 1rem;
       margin-bottom: 2rem;
     }
+    .gallery-item {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 3px 14px var(--shadow);
+    }
+    .gallery-item:hover .gallery-heart { opacity: 1; }
     .gallery-img {
       width: 100%;
       aspect-ratio: 1;
       object-fit: cover;
-      border-radius: 12px;
-      box-shadow: 0 3px 14px var(--shadow);
+      display: block;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: transform 0.2s;
     }
-    .gallery-img:hover { transform: scale(1.03); box-shadow: 0 6px 24px var(--shadow); }
+    .gallery-item:hover .gallery-img { transform: scale(1.03); }
+    .gallery-heart {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      opacity: 0.85;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .gallery-heart:hover { background: rgba(200,0,60,0.8); transform: scale(1.1); }
+    .gallery-heart.liked { background: rgba(200,0,60,0.85); }
+    .gallery-heart .heart-icon { font-size: 1.1rem; }
     .gallery-empty { grid-column: 1/-1; text-align: center; color: var(--mid); font-style: italic; padding: 2rem; }
     .gallery-pagination { display: flex; align-items: center; justify-content: center; gap: 1rem; margin: 1.5rem 0 2rem; }
     .gallery-pagination button { background: var(--gold); color: #fff; border: none; border-radius: 8px; padding: 0.5rem 1.4rem; font-size: 0.95rem; cursor: pointer; transition: background 0.2s; }
@@ -389,10 +415,54 @@
       z-index: 999;
       align-items: center;
       justify-content: center;
+      padding: 1rem;
     }
     .lightbox.open { display: flex; }
-    .lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; box-shadow: 0 8px 60px rgba(0,0,0,0.8); }
-    .lightbox-close { position: absolute; top: 1.2rem; right: 1.5rem; font-size: 2rem; color: white; cursor: pointer; user-select: none; }
+    .lightbox-inner {
+      display: flex;
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      max-width: 960px;
+      width: 100%;
+      max-height: 90vh;
+      box-shadow: 0 8px 60px rgba(0,0,0,0.8);
+    }
+    .lightbox-photo {
+      flex: 1 1 55%;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox-photo img {
+      max-width: 100%;
+      max-height: 90vh;
+      object-fit: contain;
+      display: block;
+    }
+    .lightbox-comments {
+      flex: 0 0 320px;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      padding: 1.2rem;
+      overflow: hidden;
+    }
+    .lightbox-comments h3 { font-size: 1rem; color: var(--brown); margin-bottom: 0.8rem; border-bottom: 2px solid var(--gold-pale); padding-bottom: 0.5rem; }
+    .lightbox-comment-list { flex: 1; overflow-y: auto; margin-bottom: 0.8rem; display: flex; flex-direction: column; gap: 0.6rem; }
+    .lightbox-comment-item { background: var(--cream); border-radius: 10px; padding: 0.6rem 0.8rem; font-size: 0.9rem; }
+    .lightbox-comment-item strong { color: var(--gold); display: block; margin-bottom: 0.2rem; font-size: 0.85rem; }
+    .lightbox-comment-empty { color: var(--mid); font-style: italic; font-size: 0.9rem; text-align: center; margin-top: 1rem; }
+    .lightbox-comment-form input, .lightbox-comment-form textarea {
+      width: 100%; border: 1px solid #ddd; border-radius: 8px;
+      padding: 0.5rem 0.7rem; font-size: 0.9rem; margin-bottom: 0.5rem;
+      font-family: inherit; box-sizing: border-box;
+    }
+    .lightbox-comment-form textarea { height: 70px; resize: none; }
+    .lightbox-comment-form button { width: 100%; background: var(--gold); color: #fff; border: none; border-radius: 8px; padding: 0.55rem; font-size: 0.95rem; cursor: pointer; }
+    .lightbox-comment-form button:hover { background: var(--amber); }
+    .lightbox-close { position: absolute; top: 1rem; right: 1rem; font-size: 2rem; color: white; cursor: pointer; user-select: none; z-index: 1000; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
 
     /* ── TOAST ─────────────────────────────────── */
     .toast {
@@ -552,8 +622,23 @@
 
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <span class="lightbox-close">&times;</span>
-  <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()" />
+  <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+  <div class="lightbox-inner" onclick="event.stopPropagation()">
+    <div class="lightbox-photo">
+      <img id="lightbox-img" src="" alt="" />
+    </div>
+    <div class="lightbox-comments">
+      <h3>💬 Comments</h3>
+      <div class="lightbox-comment-list" id="lightbox-comment-list">
+        <p class="lightbox-comment-empty">No comments yet — be the first!</p>
+      </div>
+      <div class="lightbox-comment-form">
+        <input type="text" id="lightbox-comment-name" placeholder="Your name" maxlength="60" />
+        <textarea id="lightbox-comment-text" placeholder="Leave a message about this photo…" maxlength="500"></textarea>
+        <button onclick="submitPhotoComment()">💛 Post Comment</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- TOAST -->
@@ -576,12 +661,48 @@
     t._timer = setTimeout(() => t.classList.remove('show'), 3200)
   }
 
-  function openLightbox(src) {
+  let currentLightboxPhotoId = null
+
+  async function openLightbox(src, photoId) {
     document.getElementById('lightbox-img').src = src
     document.getElementById('lightbox').classList.add('open')
+    document.getElementById('lightbox-comment-name').value = ''
+    document.getElementById('lightbox-comment-text').value = ''
+    currentLightboxPhotoId = photoId || null
+    const list = document.getElementById('lightbox-comment-list')
+    list.innerHTML = '<p class="lightbox-comment-empty">Loading…</p>'
+    if (photoId) {
+      const { data } = await db.from('photo_comments').select('*').eq('photo_id', photoId).order('created_at', { ascending: true })
+      renderPhotoComments(data || [])
+    }
+  }
+  function renderPhotoComments(comments) {
+    const list = document.getElementById('lightbox-comment-list')
+    if (!comments.length) {
+      list.innerHTML = '<p class="lightbox-comment-empty">No comments yet — be the first!</p>'
+      return
+    }
+    list.innerHTML = comments.map(c => `
+      <div class="lightbox-comment-item">
+        <strong>${escHtml(c.name)}</strong>
+        ${escHtml(c.comment)}
+      </div>`).join('')
+    list.scrollTop = list.scrollHeight
+  }
+  async function submitPhotoComment() {
+    const name = document.getElementById('lightbox-comment-name').value.trim()
+    const comment = document.getElementById('lightbox-comment-text').value.trim()
+    if (!name || !comment || !currentLightboxPhotoId) return
+    const { data, error } = await db.from('photo_comments').insert({ photo_id: currentLightboxPhotoId, name, comment }).select()
+    if (!error && data) {
+      document.getElementById('lightbox-comment-text').value = ''
+      const { data: all } = await db.from('photo_comments').select('*').eq('photo_id', currentLightboxPhotoId).order('created_at', { ascending: true })
+      renderPhotoComments(all || [])
+    }
   }
   function closeLightbox() {
     document.getElementById('lightbox').classList.remove('open')
+    currentLightboxPhotoId = null
   }
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox() })
 
@@ -652,6 +773,15 @@
     renderGalleryPage()
   }
 
+  function addGalleryPhoto(url, id) {
+    if (allPhotos.find(p => p.id === id)) return
+    allPhotos.unshift({ url, id, likes: 0 })
+    galleryPage = 1
+    renderGalleryPage()
+  }
+
+  const likedPhotos = new Set(JSON.parse(localStorage.getItem('likedPhotos') || '[]'))
+
   function renderGalleryPage() {
     const grid = document.getElementById('gallery-grid')
     const pagination = document.getElementById('gallery-pagination')
@@ -660,17 +790,40 @@
     const pagePhotos = allPhotos.slice(start, start + PHOTOS_PER_PAGE)
     grid.innerHTML = ''
     pagePhotos.forEach(p => {
+      const item = document.createElement('div')
+      item.className = 'gallery-item'
+
       const img = document.createElement('img')
       img.src = p.url
       img.className = 'gallery-img'
       img.alt = 'Memory of Anthony'
-      img.onclick = () => openLightbox(p.url)
-      grid.appendChild(img)
+      img.onclick = () => openLightbox(p.url, p.id)
+
+      const btn = document.createElement('button')
+      btn.className = 'gallery-heart' + (likedPhotos.has(p.id) ? ' liked' : '')
+      btn.innerHTML = `<span class="heart-icon">❤️</span><span class="heart-count">${p.likes || 0}</span>`
+      btn.onclick = (e) => { e.stopPropagation(); likePhoto(p.id, btn) }
+
+      item.appendChild(img)
+      item.appendChild(btn)
+      grid.appendChild(item)
     })
     pagination.style.display = totalPages > 1 ? 'flex' : 'none'
     document.getElementById('gallery-prev').disabled = galleryPage === 1
     document.getElementById('gallery-next').disabled = galleryPage === totalPages
     document.getElementById('gallery-page-info').textContent = `Page ${galleryPage} of ${totalPages}`
+  }
+
+  async function likePhoto(id, btn) {
+    if (likedPhotos.has(id)) return
+    likedPhotos.add(id)
+    localStorage.setItem('likedPhotos', JSON.stringify([...likedPhotos]))
+    btn.classList.add('liked')
+    const countEl = btn.querySelector('.heart-count')
+    countEl.textContent = parseInt(countEl.textContent) + 1
+    const photo = allPhotos.find(p => p.id === id)
+    if (photo) photo.likes = (photo.likes || 0) + 1
+    await db.rpc('increment_photo_likes', { photo_id: id })
   }
 
   function galleryChangePage(dir) {
@@ -679,12 +832,6 @@
     document.getElementById('gallery').scrollIntoView({ behavior: 'smooth' })
   }
 
-  function addGalleryPhoto(url, id) {
-    if (allPhotos.find(p => p.id === id)) return
-    allPhotos.unshift({ url, id })
-    galleryPage = 1
-    renderGalleryPage()
-  }
 
   async function uploadGalleryPhoto(input) {
     if (!input.files[0]) return
