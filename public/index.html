@@ -468,6 +468,16 @@
     .msg-name { font-weight: 700; color: var(--gold); margin-bottom: 0.2rem; }
     .msg-text { color: var(--brown); line-height: 1.65; font-size: 0.97rem; }
     .msg-date { font-size: 0.78rem; color: #AAA; margin-top: 0.4rem; }
+    .msg-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem; }
+    .msg-heart-btn {
+      background: none; border: 1.5px solid #e8c0c8; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      font-size: 0.85rem; color: #c0607a; padding: 5px 12px;
+      border-radius: 20px; transition: all 0.2s; font-family: 'Lato', sans-serif;
+      font-weight: 700; user-select: none;
+    }
+    .msg-heart-btn:hover { border-color: #e0305a; color: #e0305a; background: #fff0f3; transform: scale(1.05); }
+    .msg-heart-btn.liked { border-color: #e0305a; color: #e0305a; background: #fff0f3; }
     .msg-photo { margin-top: 0.6rem; }
     .msg-photo img { max-width: 180px; border-radius: 8px; cursor: pointer; }
     .no-messages { text-align: center; color: var(--mid); font-style: italic; padding: 2rem; }
@@ -1244,6 +1254,9 @@
       year: 'numeric', month: 'long', day: 'numeric'
     })
 
+    const liked = localStorage.getItem('msg_liked_' + m.id) === '1'
+    const likes = parseInt(m.likes || 0)
+
     const card = document.createElement('div')
     card.className = 'message-card'
     card.dataset.msgId = m.id
@@ -1253,9 +1266,37 @@
         <div class="msg-name">${escHtml(m.name)}</div>
         <div class="msg-text">${escHtml(m.message)}</div>
         ${m.photo_url ? `<div class="msg-photo"><img src="${escHtml(m.photo_url)}" alt="shared photo" onclick="openLightbox('${escHtml(m.photo_url)}')" /></div>` : ''}
-        <div class="msg-date">${date}</div>
+        <div class="msg-footer">
+          <span class="msg-date">${date}</span>
+          <button class="msg-heart-btn ${liked ? 'liked' : ''}" data-msg-id="${m.id}" data-likes="${likes}">
+            <span class="mheart">${liked ? '♥' : '♡'}</span>
+            <span class="msg-like-count">${likes}</span>
+          </button>
+        </div>
       </div>
     `
+
+    // Heart click handler
+    card.querySelector('.msg-heart-btn').addEventListener('click', async function(e) {
+      e.stopPropagation()
+      const mid = this.dataset.msgId
+      const likedKey = 'msg_liked_' + mid
+      if (localStorage.getItem(likedKey) === '1') {
+        this.style.transform = 'scale(1.15)'
+        setTimeout(() => this.style.transform = '', 150)
+        return
+      }
+      localStorage.setItem(likedKey, '1')
+      this.classList.add('liked')
+      this.querySelector('.mheart').textContent = '♥'
+      const newCount = parseInt(this.dataset.likes || 0) + 1
+      this.dataset.likes = newCount
+      this.querySelector('.msg-like-count').textContent = newCount
+      this.style.transform = 'scale(1.25)'
+      setTimeout(() => this.style.transform = '', 200)
+      try { await db.rpc('increment_message_likes', { message_id: parseInt(mid) }) } catch(e) {}
+    })
+
     list.insertBefore(card, list.firstChild)
   }
 
