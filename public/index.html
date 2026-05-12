@@ -432,6 +432,54 @@
       50%       { opacity: 0.5; transform: scale(0.8); }
     }
 
+    /* ── MUSIC PLAYER ─────────────────────────── */
+    .music-player {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 1.5rem;
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(30,12,4,0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(200,146,42,0.4);
+      border-radius: 999px;
+      padding: 0.55rem 1rem 0.55rem 0.55rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      transition: opacity 0.3s;
+      cursor: default;
+    }
+    .music-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #F5C842, #E8851A);
+      color: #3A200A;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.15s;
+    }
+    .music-btn:hover { transform: scale(1.1); }
+    .music-label {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.3;
+      max-width: 130px;
+    }
+    .music-label strong { color: var(--gold-light); display: block; font-size: 0.8rem; }
+    @keyframes music-pulse {
+      0%, 100% { box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 0 0 rgba(200,146,42,0.4); }
+      50%       { box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 0 6px rgba(200,146,42,0); }
+    }
+    .music-player.playing { animation: music-pulse 2.5s ease-in-out infinite; }
+
     /* ── FOOTER ────────────────────────────────── */
     footer {
       background: var(--brown);
@@ -1101,6 +1149,60 @@
   loadCandles()
   loadGallery()
   loadMessages()
+</script>
+
+<!-- BACKGROUND MUSIC -->
+<audio id="bg-music" loop preload="auto">
+  <source src="https://archive.org/download/chopin-nocturne-op.-9-no.-2/Chopin%20-%20Nocturne%20op.9%20No.2.mp3" type="audio/mpeg" />
+</audio>
+
+<div class="music-player" id="music-player">
+  <button class="music-btn" id="music-btn" title="Play / Pause music" onclick="toggleMusic()">▶</button>
+  <div class="music-label">
+    <strong>🎹 Chopin — Nocturne</strong>
+    Op. 9 No. 2 · Public Domain
+  </div>
+</div>
+
+<script>
+  const audio = document.getElementById('bg-music')
+  const btn   = document.getElementById('music-btn')
+  const player = document.getElementById('music-player')
+  audio.volume = 0.35
+
+  function setPlaying(state) {
+    if (state) {
+      btn.textContent = '⏸'
+      player.classList.add('playing')
+    } else {
+      btn.textContent = '▶'
+      player.classList.remove('playing')
+    }
+  }
+
+  function toggleMusic() {
+    if (audio.paused) {
+      audio.play().then(() => setPlaying(true)).catch(() => {})
+    } else {
+      audio.pause()
+      setPlaying(false)
+    }
+  }
+
+  // Try autoplay on first user interaction with the page
+  let autoplayed = false
+  function tryAutoplay() {
+    if (autoplayed) return
+    autoplayed = true
+    audio.play().then(() => setPlaying(true)).catch(() => {
+      // Browser blocked autoplay — player stays in paused state, user clicks to start
+    })
+  }
+  document.addEventListener('click', tryAutoplay, { once: true })
+  document.addEventListener('scroll', tryAutoplay, { once: true })
+
+  // Also try immediately (works if user has interacted with site before)
+  audio.play().then(() => { autoplayed = true; setPlaying(true) }).catch(() => {})
 </script>
 </body>
 </html>
