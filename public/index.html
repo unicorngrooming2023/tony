@@ -1047,8 +1047,9 @@
         setTimeout(() => this.style.transform = '', 200)
         // Save to Supabase so ALL visitors see the updated count
         try {
-          await db.rpc('increment_comment_likes', { comment_id: cid })
-        } catch(e) {}
+          const { error } = await db.rpc('increment_comment_likes', { comment_id: cid })
+          if (error) { console.error('comment like error:', error); localStorage.removeItem('comment_liked_' + cid); }
+        } catch(e) { console.error('comment like catch:', e) }
       })
     })
 
@@ -1350,7 +1351,10 @@
       this.querySelector('.msg-like-count').textContent = newCount
       this.style.transform = 'scale(1.25)'
       setTimeout(() => this.style.transform = '', 200)
-      try { await db.rpc('increment_message_likes', { message_id: mid }) } catch(e) {}
+      try {
+        const { error } = await db.rpc('increment_message_likes', { message_id: mid })
+        if (error) { console.error('msg like error:', error); localStorage.removeItem(likedKey); }
+      } catch(e) { console.error('msg like catch:', e) }
     })
 
     list.insertBefore(card, list.firstChild)
