@@ -342,38 +342,60 @@
     .gallery-page-info { color: var(--brown); font-size: 0.9rem; min-width: 80px; text-align: center; }
 
     .upload-box {
-      border: 2.5px dashed var(--gold);
-      border-radius: 14px;
-      padding: 2rem;
+      border: 3px dashed var(--gold);
+      border-radius: 18px;
+      padding: 2.5rem 2rem;
       text-align: center;
-      background: rgba(255,255,255,0.6);
+      background: linear-gradient(135deg, rgba(255,248,220,0.9), rgba(255,255,255,0.95));
       cursor: pointer;
-      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      transition: all 0.2s;
+      box-shadow: 0 4px 24px rgba(200,146,42,0.15);
+      animation: upload-glow 3s ease-in-out infinite alternate;
     }
-    .upload-box:hover { background: rgba(255,255,255,0.9); }
+    @keyframes upload-glow {
+      0%   { box-shadow: 0 4px 24px rgba(200,146,42,0.15); border-color: var(--gold); }
+      100% { box-shadow: 0 6px 32px rgba(200,146,42,0.35); border-color: var(--amber); }
+    }
+    .upload-box:hover {
+      background: linear-gradient(135deg, rgba(255,248,220,1), #fff);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 36px rgba(200,146,42,0.3);
+      animation: none;
+      border-color: var(--amber);
+    }
     .upload-box.drag-over {
-      background: rgba(255,255,255,0.95);
+      background: rgba(255,255,255,0.98);
       border-color: var(--amber);
       border-style: solid;
       transform: scale(1.02);
-      box-shadow: 0 0 0 4px rgba(232,133,26,0.15);
+      box-shadow: 0 0 0 6px rgba(232,133,26,0.2);
+      animation: none;
     }
     .upload-box input[type=file] { display: none; }
-    .upload-box-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
-    .upload-box p { color: var(--mid); font-size: 0.95rem; }
+    .upload-box-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+    .upload-box-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: var(--brown);
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+    .upload-box p { color: var(--mid); font-size: 0.92rem; }
     .btn-upload {
-      margin-top: 1rem;
-      background: var(--gold);
-      color: #fff;
+      margin-top: 1.2rem;
+      background: linear-gradient(135deg, #F5C842, #E8851A);
+      color: var(--brown);
       border: none;
-      padding: 0.6rem 1.8rem;
+      padding: 0.75rem 2.2rem;
       border-radius: 999px;
       font-weight: 700;
       cursor: pointer;
-      font-size: 0.9rem;
-      transition: background 0.2s;
+      font-size: 1rem;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(232,133,26,0.4);
+      letter-spacing: 0.02em;
     }
-    .btn-upload:hover { background: var(--amber); }
+    .btn-upload:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(232,133,26,0.55); }
 
     /* ── MESSAGES ──────────────────────────────── */
     .message-form {
@@ -746,11 +768,12 @@
       <button id="gallery-next" onclick="galleryChangePage(1)">Next →</button>
     </div>
     <div class="upload-box" id="upload-box" onclick="document.getElementById('gallery-file').click()">
-      <div class="upload-box-icon">📷</div>
-      <p>Drag &amp; drop a photo here, or click to browse</p>
-      <p style="font-size:0.82rem; margin-top:0.3rem; color:#AAA;">JPG, PNG or GIF · up to 20 MB</p>
+      <div class="upload-box-icon">📸</div>
+      <div class="upload-box-title">Share a Photo of Tony</div>
+      <p>Do you have a photo of Tony? We'd love to see it.</p>
+      <p style="font-size:0.82rem; margin-top:0.3rem; color:#AAA;">Drag &amp; drop or click · JPG, PNG or GIF · up to 20 MB</p>
       <input type="file" id="gallery-file" accept="image/*" onchange="uploadGalleryPhoto(this)" />
-      <div><button class="btn-upload" onclick="event.stopPropagation(); document.getElementById('gallery-file').click()">Choose Photo</button></div>
+      <div><button class="btn-upload" onclick="event.stopPropagation(); document.getElementById('gallery-file').click()">📷 Add Your Photo</button></div>
     </div>
   </div>
 </div>
