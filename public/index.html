@@ -662,6 +662,35 @@
     .lightbox-comment-form button { width: 100%; background: var(--gold); color: #fff; border: none; border-radius: 8px; padding: 0.55rem; font-size: 0.95rem; cursor: pointer; }
     .lightbox-comment-form button:hover { background: var(--amber); }
     .lightbox-close { position: absolute; top: 1rem; right: 1rem; font-size: 2rem; color: white; cursor: pointer; user-select: none; z-index: 1000; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
+    .lightbox-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      border: none;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      cursor: pointer;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.15s;
+      user-select: none;
+      backdrop-filter: blur(4px);
+    }
+    .lightbox-arrow:hover { background: rgba(0,0,0,0.8); transform: translateY(-50%) scale(1.1); }
+    .lightbox-arrow.prev { left: 1rem; }
+    .lightbox-arrow.next { right: 1rem; }
+    .lightbox-arrow:disabled { opacity: 0.2; cursor: default; }
+    @media (max-width: 640px) {
+      .lightbox-arrow { width: 38px; height: 38px; font-size: 1.1rem; }
+      .lightbox-arrow.prev { left: 0.5rem; }
+      .lightbox-arrow.next { right: 0.5rem; }
+    }
 
     /* ── TOAST ─────────────────────────────────── */
     .toast {
@@ -893,6 +922,8 @@
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+  <button class="lightbox-arrow prev" id="lb-prev" onclick="event.stopPropagation(); navigateLightbox(-1)">&#8592;</button>
+  <button class="lightbox-arrow next" id="lb-next" onclick="event.stopPropagation(); navigateLightbox(1)">&#8594;</button>
   <div class="lightbox-inner" onclick="event.stopPropagation()">
     <div class="lightbox-photo">
       <img id="lightbox-img" src="" alt="" />
@@ -934,7 +965,12 @@
 
   let currentLightboxPhotoId = null
 
+  let currentLightboxIndex = -1
+
   async function openLightbox(src, photoId) {
+    // Find index in allPhotos for arrow navigation
+    currentLightboxIndex = photoId ? allPhotos.findIndex(p => p.id === photoId) : -1
+    updateLightboxArrows()
     document.getElementById('lightbox-img').src = src
     document.getElementById('lightbox-thumb').src = src
     document.getElementById('lightbox').classList.add('open')
@@ -947,6 +983,21 @@
       const { data } = await db.from('photo_comments').select('*').eq('photo_id', photoId).order('created_at', { ascending: true })
       renderPhotoComments(data || [])
     }
+  }
+
+  function updateLightboxArrows() {
+    const prev = document.getElementById('lb-prev')
+    const next = document.getElementById('lb-next')
+    if (!prev || !next) return
+    prev.disabled = currentLightboxIndex <= 0
+    next.disabled = currentLightboxIndex < 0 || currentLightboxIndex >= allPhotos.length - 1
+  }
+
+  function navigateLightbox(dir) {
+    const newIndex = currentLightboxIndex + dir
+    if (newIndex < 0 || newIndex >= allPhotos.length) return
+    const photo = allPhotos[newIndex]
+    if (photo) openLightbox(photo.url, photo.id)
   }
   function renderPhotoComments(comments) {
     const list = document.getElementById('lightbox-comment-list')
