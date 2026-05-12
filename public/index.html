@@ -1224,7 +1224,7 @@
 </script>
 
 <!-- BACKGROUND MUSIC -->
-<audio id="bg-music" loop preload="auto">
+<audio id="bg-music" loop preload="auto" autoplay muted>
   <source src="https://archive.org/download/chopin-nocturne-op.-9-no.-2/Chopin%20-%20Nocturne%20op.9%20No.2.mp3" type="audio/mpeg" />
 </audio>
 
@@ -1255,24 +1255,31 @@
     }
   }
 
-  // Autoplay trick: muted autoplay is always allowed by browsers.
-  // Start muted → play → unmute instantly. Music begins the moment the page loads.
-  audio.muted = true
-  audio.play().then(() => {
+  // Unmute immediately — audio element already has autoplay+muted so it starts playing.
+  // We just need to unmute it right away.
+  function startMusic() {
     audio.muted = false
-    setPlaying(true)
-  }).catch(() => {
-    // Fallback: wait for first tap/click then play
-    setPlaying(false)
-    const unlock = () => {
-      audio.muted = false
-      audio.play().then(() => setPlaying(true)).catch(() => {})
-      document.removeEventListener('click', unlock)
-      document.removeEventListener('touchstart', unlock)
+    audio.volume = 0.35
+    if (audio.paused) {
+      audio.play().catch(() => {})
     }
-    document.addEventListener('click', unlock)
-    document.addEventListener('touchstart', unlock)
-  })
+    setPlaying(true)
+  }
+
+  // Try to unmute instantly on load
+  audio.addEventListener('canplaythrough', startMusic, { once: true })
+
+  // Also try immediately in case it's already loaded
+  if (audio.readyState >= 3) startMusic()
+
+  // Final fallback: first interaction
+  const unlock = () => {
+    startMusic()
+    document.removeEventListener('click', unlock)
+    document.removeEventListener('touchstart', unlock)
+  }
+  document.addEventListener('click', unlock)
+  document.addEventListener('touchstart', unlock)
 </script>
 </body>
 </html>
