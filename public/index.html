@@ -470,6 +470,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
     }
     .lightbox-photo img {
       width: 100%;
@@ -697,6 +698,9 @@
   <p style="margin-top:1rem; font-size:0.8rem; opacity:0.45;">
     Last updated: <span id="footer-updated"></span>
   </p>
+  <p style="margin-top:0.6rem; font-size:0.82rem; opacity:0.55;">
+    👁 <span id="visitor-count">—</span> visitors have stopped by to remember Anthony
+  </p>
 </footer>
 <script>
   (function() {
@@ -705,6 +709,34 @@
     document.getElementById('footer-updated').textContent =
       months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
   })();
+</script>
+<script>
+  (async function() {
+    try {
+      const SUPA_URL = 'https://vaxpikbcngfpmmhygktp.supabase.co'
+      const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZheHBpa2JjbmdmcG1taHlna3RwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0OTk4ODcsImV4cCI6MjA2MjA3NTg4N30.qhOPuTpCPQUJBqvFAQq3HuW4LPbC0MSdNg80U5OPnqs'
+      const headers = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json' }
+
+      // Count this as a new visit if not seen in this browser session
+      const isNew = !sessionStorage.getItem('tony_visited')
+      if (isNew) {
+        sessionStorage.setItem('tony_visited', '1')
+        // Increment counter via RPC
+        await fetch(SUPA_URL + '/rest/v1/rpc/increment_visitors', {
+          method: 'POST', headers, body: '{}'
+        })
+      }
+
+      // Always fetch and display the current count
+      const res = await fetch(SUPA_URL + '/rest/v1/site_stats?id=eq.1&select=visitors', { headers })
+      const data = await res.json()
+      if (data && data[0]) {
+        document.getElementById('visitor-count').textContent = data[0].visitors.toLocaleString()
+      }
+    } catch(e) {
+      document.getElementById('visitor-count').textContent = '—'
+    }
+  })()
 </script>
 
 <!-- LIGHTBOX -->
