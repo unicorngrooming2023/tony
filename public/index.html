@@ -1047,7 +1047,7 @@
         setTimeout(() => this.style.transform = '', 200)
         // Save to Supabase so ALL visitors see the updated count
         try {
-          await db.rpc('increment_comment_likes', { comment_id: parseInt(cid) })
+          await db.rpc('increment_comment_likes', { comment_id: cid })
         } catch(e) {}
       })
     })
@@ -1350,7 +1350,7 @@
       this.querySelector('.msg-like-count').textContent = newCount
       this.style.transform = 'scale(1.25)'
       setTimeout(() => this.style.transform = '', 200)
-      try { await db.rpc('increment_message_likes', { message_id: parseInt(mid) }) } catch(e) {}
+      try { await db.rpc('increment_message_likes', { message_id: mid }) } catch(e) {}
     })
 
     list.insertBefore(card, list.firstChild)
