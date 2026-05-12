@@ -257,7 +257,7 @@
     .tribute-ticker-track {
       display: inline-flex;
       gap: 0;
-      animation: ticker-scroll 40s linear infinite;
+      animation: ticker-scroll 22s linear infinite;
     }
     .tribute-ticker-track:hover { animation-play-state: paused; }
     .tribute-ticker-item {
@@ -1139,7 +1139,7 @@
     ticker.style.display = 'block'
     // Adjust speed based on content length
     const totalChars = items.reduce((s, m) => s + m.name.length + (m.message || '').length, 0)
-    const duration = Math.max(25, Math.min(80, totalChars * 0.25))
+    const duration = Math.max(15, Math.min(45, totalChars * 0.14))
     track.style.animationDuration = duration + 's'
   }
 
