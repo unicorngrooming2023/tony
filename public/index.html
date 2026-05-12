@@ -758,7 +758,18 @@
     &nbsp;·&nbsp;
     <a href="mailto:semira.huang@gmail.com" style="color:inherit;">semira.huang@gmail.com</a>
   </p>
+  <p style="margin-top:1rem; font-size:0.8rem; opacity:0.45;">
+    Last updated: <span id="footer-updated"></span>
+  </p>
 </footer>
+<script>
+  (function() {
+    var d = new Date();
+    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('footer-updated').textContent =
+      months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+  })();
+</script>
 
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
