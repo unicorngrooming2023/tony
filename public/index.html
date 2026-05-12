@@ -608,6 +608,16 @@
     .lightbox-comment-list { flex: 1; overflow-y: auto; margin-bottom: 0.8rem; display: flex; flex-direction: column; gap: 0.6rem; }
     .lightbox-comment-item { background: var(--cream); border-radius: 10px; padding: 0.6rem 0.8rem; font-size: 0.9rem; }
     .lightbox-comment-item strong { color: var(--gold); display: block; margin-bottom: 0.2rem; font-size: 0.85rem; }
+    .comment-footer { display: flex; align-items: center; justify-content: flex-end; margin-top: 0.4rem; }
+    .comment-heart-btn {
+      background: none; border: none; cursor: pointer;
+      display: flex; align-items: center; gap: 0.25rem;
+      font-size: 0.82rem; color: #aaa; padding: 2px 6px;
+      border-radius: 20px; transition: all 0.15s;
+    }
+    .comment-heart-btn:hover { background: rgba(200,0,60,0.08); color: #e05; }
+    .comment-heart-btn.liked { color: #e0305a; }
+    .comment-heart-btn .cheart { font-size: 1rem; }
     .lightbox-comment-empty { color: var(--mid); font-style: italic; font-size: 0.9rem; text-align: center; margin-top: 1rem; }
     .lightbox-comment-form input, .lightbox-comment-form textarea {
       width: 100%; border: 1px solid #ddd; border-radius: 8px;
@@ -909,12 +919,37 @@
       list.innerHTML = '<p class="lightbox-comment-empty">No comments yet — be the first!</p>'
       return
     }
-    list.innerHTML = comments.map(c => `
-      <div class="lightbox-comment-item">
-        <strong>${escHtml(c.name)}</strong>
-        ${escHtml(c.comment)}
-      </div>`).join('')
+    list.innerHTML = comments.map(c => {
+      const liked = localStorage.getItem('comment_liked_' + c.id) === '1'
+      const likes = c.likes || 0
+      return `
+        <div class="lightbox-comment-item" id="comment-${c.id}">
+          <strong>${escHtml(c.name)}</strong>
+          ${escHtml(c.comment)}
+          <div class="comment-footer">
+            <button class="comment-heart-btn ${liked ? 'liked' : ''}"
+              onclick="likeComment(${c.id}, this)" title="Love this">
+              <span class="cheart">${liked ? '❤️' : '🤍'}</span>
+              <span class="comment-like-count">${likes > 0 ? likes : ''}</span>
+            </button>
+          </div>
+        </div>`
+    }).join('')
     list.scrollTop = list.scrollHeight
+  }
+
+  async function likeComment(commentId, btn) {
+    const key = 'comment_liked_' + commentId
+    if (localStorage.getItem(key) === '1') return // already liked
+    localStorage.setItem(key, '1')
+    btn.classList.add('liked')
+    btn.querySelector('.cheart').textContent = '❤️'
+    // optimistic count update
+    const countEl = btn.querySelector('.comment-like-count')
+    const current = parseInt(countEl.textContent) || 0
+    countEl.textContent = current + 1
+    // persist to Supabase
+    await db.rpc('increment_comment_likes', { comment_id: commentId })
   }
   async function submitPhotoComment() {
     const name = document.getElementById('lightbox-comment-name').value.trim()
