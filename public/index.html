@@ -244,6 +244,47 @@
     .btn-candle:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
     .candle-total { margin-top: 1rem; color: rgba(255,255,255,0.5); font-size: 0.9rem; }
 
+    /* ── TRIBUTE TICKER ────────────────────────── */
+    .tribute-ticker {
+      background: rgba(0,0,0,0.3);
+      border-top: 1px solid rgba(200,146,42,0.25);
+      border-bottom: 1px solid rgba(200,146,42,0.25);
+      padding: 0.75rem 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-top: 2.5rem;
+    }
+    .tribute-ticker-track {
+      display: inline-flex;
+      gap: 0;
+      animation: ticker-scroll 40s linear infinite;
+    }
+    .tribute-ticker-track:hover { animation-play-state: paused; }
+    .tribute-ticker-item {
+      display: inline-block;
+      padding: 0 2.5rem;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1rem;
+      color: rgba(255,255,255,0.88);
+    }
+    .tribute-ticker-item .ticker-name {
+      color: var(--gold-light);
+      font-style: normal;
+      font-weight: 700;
+      margin-right: 0.3rem;
+    }
+    .tribute-ticker-sep {
+      display: inline-block;
+      padding: 0 0.5rem;
+      color: rgba(200,146,42,0.5);
+      font-style: normal;
+    }
+    @keyframes ticker-scroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
     /* ── GALLERY ───────────────────────────────── */
     #gallery { background: var(--gold-pale); max-width: 100%; padding: 4rem 1.5rem; }
     .gallery-inner { max-width: 900px; margin: 0 auto; }
@@ -675,6 +716,11 @@
   <div class="candles-grid" id="candle-grid"></div>
   <button class="btn-candle" id="candle-btn" onclick="lightCandle()">🕯️ Light a Candle</button>
   <p class="candle-total" id="candle-total">Loading…</p>
+
+  <!-- Tribute ticker -->
+  <div class="tribute-ticker" id="tribute-ticker" style="display:none;">
+    <div class="tribute-ticker-track" id="tribute-ticker-track"></div>
+  </div>
 </div>
 
 <!-- GALLERY -->
@@ -1070,6 +1116,31 @@
     }
     list.innerHTML = ''
     data.forEach(renderMessage)
+    buildTicker(data)
+  }
+
+  function buildTicker(messages) {
+    const ticker = document.getElementById('tribute-ticker')
+    const track  = document.getElementById('tribute-ticker-track')
+    // Use messages that have a name and some text content
+    const items = messages.filter(m => m.name && m.message).slice(0, 20)
+    if (!items.length) return
+    // Build items HTML — duplicate for seamless loop
+    function makeItems() {
+      return items.map(m => {
+        const name = escHtml(m.name.trim())
+        const msg  = escHtml(m.message.trim().replace(/\n/g, ' '))
+        // Truncate to ~80 chars for ticker
+        const short = msg.length > 80 ? msg.slice(0, 80).trim() + '…' : msg
+        return `<span class="tribute-ticker-item"><span class="ticker-name">${name}:</span>${short}</span><span class="tribute-ticker-sep">✦</span>`
+      }).join('')
+    }
+    track.innerHTML = makeItems() + makeItems() // duplicate for seamless scroll
+    ticker.style.display = 'block'
+    // Adjust speed based on content length
+    const totalChars = items.reduce((s, m) => s + m.name.length + (m.message || '').length, 0)
+    const duration = Math.max(25, Math.min(80, totalChars * 0.25))
+    track.style.animationDuration = duration + 's'
   }
 
   function renderMessage(m) {
