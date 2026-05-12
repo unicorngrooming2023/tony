@@ -1165,8 +1165,8 @@
 </div>
 
 <script>
-  const audio = document.getElementById('bg-music')
-  const btn   = document.getElementById('music-btn')
+  const audio  = document.getElementById('bg-music')
+  const btn    = document.getElementById('music-btn')
   const player = document.getElementById('music-player')
   audio.volume = 0.35
 
@@ -1182,6 +1182,7 @@
 
   function toggleMusic() {
     if (audio.paused) {
+      audio.muted = false
       audio.play().then(() => setPlaying(true)).catch(() => {})
     } else {
       audio.pause()
@@ -1189,20 +1190,24 @@
     }
   }
 
-  // Try autoplay on first user interaction with the page
-  let autoplayed = false
-  function tryAutoplay() {
-    if (autoplayed) return
-    autoplayed = true
-    audio.play().then(() => setPlaying(true)).catch(() => {
-      // Browser blocked autoplay — player stays in paused state, user clicks to start
-    })
-  }
-  document.addEventListener('click', tryAutoplay, { once: true })
-  document.addEventListener('scroll', tryAutoplay, { once: true })
-
-  // Also try immediately (works if user has interacted with site before)
-  audio.play().then(() => { autoplayed = true; setPlaying(true) }).catch(() => {})
+  // Autoplay trick: muted autoplay is always allowed by browsers.
+  // Start muted → play → unmute instantly. Music begins the moment the page loads.
+  audio.muted = true
+  audio.play().then(() => {
+    audio.muted = false
+    setPlaying(true)
+  }).catch(() => {
+    // Fallback: wait for first tap/click then play
+    setPlaying(false)
+    const unlock = () => {
+      audio.muted = false
+      audio.play().then(() => setPlaying(true)).catch(() => {})
+      document.removeEventListener('click', unlock)
+      document.removeEventListener('touchstart', unlock)
+    }
+    document.addEventListener('click', unlock)
+    document.addEventListener('touchstart', unlock)
+  })
 </script>
 </body>
 </html>
