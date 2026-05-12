@@ -608,16 +608,16 @@
     .lightbox-comment-list { flex: 1; overflow-y: auto; margin-bottom: 0.8rem; display: flex; flex-direction: column; gap: 0.6rem; }
     .lightbox-comment-item { background: var(--cream); border-radius: 10px; padding: 0.6rem 0.8rem; font-size: 0.9rem; }
     .lightbox-comment-item strong { color: var(--gold); display: block; margin-bottom: 0.2rem; font-size: 0.85rem; }
-    .comment-footer { display: flex; align-items: center; justify-content: flex-end; margin-top: 0.4rem; }
+    .comment-footer { display: flex; align-items: center; justify-content: flex-end; margin-top: 0.5rem; }
     .comment-heart-btn {
-      background: none; border: none; cursor: pointer;
-      display: flex; align-items: center; gap: 0.25rem;
-      font-size: 0.82rem; color: #aaa; padding: 2px 6px;
-      border-radius: 20px; transition: all 0.15s;
+      background: none; border: 1px solid #ddd; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      font-size: 0.8rem; color: #999; padding: 3px 10px;
+      border-radius: 20px; transition: all 0.2s; font-family: 'Lato', sans-serif;
     }
-    .comment-heart-btn:hover { background: rgba(200,0,60,0.08); color: #e05; }
-    .comment-heart-btn.liked { color: #e0305a; }
-    .comment-heart-btn .cheart { font-size: 1rem; }
+    .comment-heart-btn:hover { border-color: #e0305a; color: #e0305a; background: rgba(224,48,90,0.06); }
+    .comment-heart-btn.liked { border-color: #e0305a; color: #e0305a; background: rgba(224,48,90,0.08); }
+    .comment-heart-btn .cheart { font-size: 0.95rem; line-height: 1; }
     .lightbox-comment-empty { color: var(--mid); font-style: italic; font-size: 0.9rem; text-align: center; margin-top: 1rem; }
     .lightbox-comment-form input, .lightbox-comment-form textarea {
       width: 100%; border: 1px solid #ddd; border-radius: 8px;
@@ -921,16 +921,16 @@
     }
     list.innerHTML = comments.map(c => {
       const liked = localStorage.getItem('comment_liked_' + c.id) === '1'
-      const likes = c.likes || 0
+      const count = parseInt(localStorage.getItem('comment_likes_count_' + c.id) || c.likes || 0)
       return `
         <div class="lightbox-comment-item" id="comment-${c.id}">
           <strong>${escHtml(c.name)}</strong>
           ${escHtml(c.comment)}
           <div class="comment-footer">
             <button class="comment-heart-btn ${liked ? 'liked' : ''}"
-              onclick="likeComment(${c.id}, this)" title="Love this">
-              <span class="cheart">${liked ? '❤️' : '🤍'}</span>
-              <span class="comment-like-count">${likes > 0 ? likes : ''}</span>
+              onclick="likeComment(${c.id}, this)" title="Like this comment">
+              <span class="cheart">${liked ? '♥' : '♡'}</span>
+              <span class="comment-like-count">${count > 0 ? count : '0'}</span>
             </button>
           </div>
         </div>`
@@ -939,17 +939,24 @@
   }
 
   async function likeComment(commentId, btn) {
-    const key = 'comment_liked_' + commentId
-    if (localStorage.getItem(key) === '1') return // already liked
-    localStorage.setItem(key, '1')
+    const likedKey = 'comment_liked_' + commentId
+    const countKey = 'comment_likes_count_' + commentId
+    if (localStorage.getItem(likedKey) === '1') {
+      // Already liked — show a little shake
+      btn.style.transform = 'scale(1.2)'
+      setTimeout(() => btn.style.transform = '', 200)
+      return
+    }
+    localStorage.setItem(likedKey, '1')
+    const newCount = (parseInt(localStorage.getItem(countKey) || 0)) + 1
+    localStorage.setItem(countKey, newCount)
     btn.classList.add('liked')
-    btn.querySelector('.cheart').textContent = '❤️'
-    // optimistic count update
-    const countEl = btn.querySelector('.comment-like-count')
-    const current = parseInt(countEl.textContent) || 0
-    countEl.textContent = current + 1
-    // persist to Supabase
-    await db.rpc('increment_comment_likes', { comment_id: commentId })
+    btn.querySelector('.cheart').textContent = '♥'
+    btn.querySelector('.comment-like-count').textContent = newCount
+    btn.style.transform = 'scale(1.3)'
+    setTimeout(() => btn.style.transform = '', 200)
+    // Try to persist to Supabase (works once SQL is run, silently skips if not)
+    try { await db.rpc('increment_comment_likes', { comment_id: commentId }) } catch(e) {}
   }
   async function submitPhotoComment() {
     const name = document.getElementById('lightbox-comment-name').value.trim()
