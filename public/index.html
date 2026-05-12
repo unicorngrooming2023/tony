@@ -1068,7 +1068,11 @@
     document.getElementById('lightbox').classList.remove('open')
     currentLightboxPhotoId = null
   }
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox() })
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeLightbox()
+    if (e.key === 'ArrowLeft')  navigateLightbox(-1)
+    if (e.key === 'ArrowRight') navigateLightbox(1)
+  })
 
   function escHtml(str) {
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
