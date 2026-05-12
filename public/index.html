@@ -303,9 +303,16 @@
       text-align: center;
       background: rgba(255,255,255,0.6);
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
     }
     .upload-box:hover { background: rgba(255,255,255,0.9); }
+    .upload-box.drag-over {
+      background: rgba(255,255,255,0.95);
+      border-color: var(--amber);
+      border-style: solid;
+      transform: scale(1.02);
+      box-shadow: 0 0 0 4px rgba(232,133,26,0.15);
+    }
     .upload-box input[type=file] { display: none; }
     .upload-box-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
     .upload-box p { color: var(--mid); font-size: 0.95rem; }
@@ -602,9 +609,9 @@
       <span class="gallery-page-info" id="gallery-page-info"></span>
       <button id="gallery-next" onclick="galleryChangePage(1)">Next →</button>
     </div>
-    <div class="upload-box" onclick="document.getElementById('gallery-file').click()">
+    <div class="upload-box" id="upload-box" onclick="document.getElementById('gallery-file').click()">
       <div class="upload-box-icon">📷</div>
-      <p>Click to share a photo of Anthony</p>
+      <p>Drag &amp; drop a photo here, or click to browse</p>
       <p style="font-size:0.82rem; margin-top:0.3rem; color:#AAA;">JPG, PNG or GIF · up to 20 MB</p>
       <input type="file" id="gallery-file" accept="image/*" onchange="uploadGalleryPhoto(this)" />
       <div><button class="btn-upload" onclick="event.stopPropagation(); document.getElementById('gallery-file').click()">Choose Photo</button></div>
@@ -895,6 +902,47 @@
     }
     input.value = ''
   }
+
+  // ── Drag & drop upload ────────────────────────────────────────────────────
+  (function() {
+    const box = document.getElementById('upload-box')
+    if (!box) return
+
+    ;['dragenter','dragover'].forEach(evt => {
+      box.addEventListener(evt, e => {
+        e.preventDefault()
+        e.stopPropagation()
+        box.classList.add('drag-over')
+      })
+    })
+    ;['dragleave','dragend'].forEach(evt => {
+      box.addEventListener(evt, e => {
+        e.preventDefault()
+        e.stopPropagation()
+        box.classList.remove('drag-over')
+      })
+    })
+    box.addEventListener('drop', async e => {
+      e.preventDefault()
+      e.stopPropagation()
+      box.classList.remove('drag-over')
+      const file = e.dataTransfer.files[0]
+      if (!file || !file.type.startsWith('image/')) {
+        showToast('Please drop an image file (JPG, PNG or GIF).')
+        return
+      }
+      showToast('Uploading photo…')
+      try {
+        const url = await uploadToStorage(file, 'gallery')
+        const { data, error } = await db.from('gallery_photos').insert({ url }).select().single()
+        if (error) throw error
+        addGalleryPhoto(data.url, data.id)
+        showToast('📷 Photo added to the gallery!')
+      } catch (err) {
+        showToast('Upload failed — please try again.')
+      }
+    })
+  })()
 
   // ── Messages ─────────────────────────────────────────────────────────────
   const renderedMessages = new Set()
