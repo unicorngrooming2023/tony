@@ -1294,7 +1294,7 @@
     ticker.style.display = 'block'
     // Adjust speed based on content length
     const totalChars = items.reduce((s, m) => s + m.name.length + (m.message || '').length, 0)
-    const duration = Math.max(15, Math.min(45, totalChars * 0.14))
+    const duration = Math.max(40, Math.min(90, totalChars * 0.3))
     track.style.animationDuration = duration + 's'
   }
 
