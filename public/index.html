@@ -1081,11 +1081,43 @@
               .replace(/"/g,'&quot;').replace(/'/g,'&#039;')
   }
 
+  const MAX_FILE_MB = 10
+  const MAX_PX = 1200  // max width or height after resize
+
+  async function resizeImage(file) {
+    return new Promise((resolve) => {
+      const img = new Image()
+      const url = URL.createObjectURL(file)
+      img.onload = () => {
+        URL.revokeObjectURL(url)
+        let { width, height } = img
+        // Only resize if bigger than MAX_PX
+        if (width <= MAX_PX && height <= MAX_PX) {
+          resolve(file)
+          return
+        }
+        if (width > height) { height = Math.round(height * MAX_PX / width); width = MAX_PX }
+        else { width = Math.round(width * MAX_PX / height); height = MAX_PX }
+        const canvas = document.createElement('canvas')
+        canvas.width = width
+        canvas.height = height
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height)
+        canvas.toBlob(blob => resolve(new File([blob], file.name, { type: 'image/jpeg' })), 'image/jpeg', 0.82)
+      }
+      img.src = url
+    })
+  }
+
   async function uploadToStorage(file, folder) {
-    const ext = file.name.split('.').pop().toLowerCase()
-    const filename = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-    const { error } = await db.storage.from(BUCKET).upload(filename, file, {
-      contentType: file.type,
+    // File size check
+    if (file.size > MAX_FILE_MB * 1024 * 1024) {
+      throw new Error(`File is too large. Please choose an image under ${MAX_FILE_MB}MB.`)
+    }
+    // Resize before upload
+    const resized = await resizeImage(file)
+    const filename = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`
+    const { error } = await db.storage.from(BUCKET).upload(filename, resized, {
+      contentType: 'image/jpeg',
       upsert: false
     })
     if (error) throw error
@@ -1152,6 +1184,12 @@
 
   const likedPhotos = new Set(JSON.parse(localStorage.getItem('likedPhotos') || '[]'))
 
+  // Supabase Pro image transform — serves small thumbnails for gallery grid
+  function thumbUrl(url, width = 400) {
+    if (!url || !url.includes('/object/public/')) return url
+    return url.replace('/object/public/', '/render/image/public/') + `?width=${width}&quality=75`
+  }
+
   function renderGalleryPage() {
     const grid = document.getElementById('gallery-grid')
     const pagination = document.getElementById('gallery-pagination')
@@ -1164,11 +1202,11 @@
       item.className = 'gallery-item'
 
       const img = document.createElement('img')
-      img.src = p.url
-      img.loading = 'lazy'   // only loads when scrolled into view
+      img.src = thumbUrl(p.url, 400)   // small thumbnail via Supabase Pro transform
+      img.loading = 'lazy'
       img.className = 'gallery-img'
       img.alt = 'Memory of Tony'
-      img.onclick = () => openLightbox(p.url, p.id)
+      img.onclick = () => openLightbox(p.url, p.id)  // full size in lightbox
 
       const btn = document.createElement('button')
       btn.className = 'gallery-heart' + (likedPhotos.has(p.id) ? ' liked' : '')
@@ -1323,7 +1361,7 @@
       <div class="msg-body">
         <div class="msg-name">${escHtml(m.name)}</div>
         <div class="msg-text">${escHtml(m.message)}</div>
-        ${m.photo_url ? `<div class="msg-photo"><img src="${escHtml(m.photo_url)}" loading="lazy" alt="shared photo" onclick="openLightbox('${escHtml(m.photo_url)}')" /></div>` : ''}
+        ${m.photo_url ? `<div class="msg-photo"><img src="${escHtml(thumbUrl(m.photo_url, 600))}" loading="lazy" alt="shared photo" onclick="openLightbox('${escHtml(m.photo_url)}')" /></div>` : ''}
         <div class="msg-footer">
           <span class="msg-date">${date}</span>
           <button class="msg-heart-btn ${liked ? 'liked' : ''}" data-msg-id="${m.id}" data-likes="${likes}">
