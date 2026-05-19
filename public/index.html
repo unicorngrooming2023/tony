@@ -1184,11 +1184,7 @@
 
   const likedPhotos = new Set(JSON.parse(localStorage.getItem('likedPhotos') || '[]'))
 
-  // Supabase Pro image transform — serves small thumbnails for gallery grid
-  function thumbUrl(url, width = 400) {
-    if (!url || !url.includes('/object/public/')) return url
-    return url.replace('/object/public/', '/render/image/public/') + `?width=${width}&quality=75`
-  }
+
 
   function renderGalleryPage() {
     const grid = document.getElementById('gallery-grid')
@@ -1202,7 +1198,7 @@
       item.className = 'gallery-item'
 
       const img = document.createElement('img')
-      img.src = thumbUrl(p.url, 400)   // small thumbnail via Supabase Pro transform
+      img.src = p.url
       img.loading = 'lazy'
       img.className = 'gallery-img'
       img.alt = 'Memory of Tony'
@@ -1361,7 +1357,7 @@
       <div class="msg-body">
         <div class="msg-name">${escHtml(m.name)}</div>
         <div class="msg-text">${escHtml(m.message)}</div>
-        ${m.photo_url ? `<div class="msg-photo"><img src="${escHtml(thumbUrl(m.photo_url, 600))}" loading="lazy" alt="shared photo" onclick="openLightbox('${escHtml(m.photo_url)}')" /></div>` : ''}
+        ${m.photo_url ? `<div class="msg-photo"><img src="${escHtml(m.photo_url)}" loading="lazy" alt="shared photo" onclick="openLightbox('${escHtml(m.photo_url)}')" /></div>` : ''}
         <div class="msg-footer">
           <span class="msg-date">${date}</span>
           <button class="msg-heart-btn ${liked ? 'liked' : ''}" data-msg-id="${m.id}" data-likes="${likes}">
