@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Tony Memorial</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold:       #C8922A;
+      --gold-light: #F0C060;
+      --gold-pale:  #FDF3DC;
+      --amber:      #E07820;
+      --cream:      #FFFBF2;
+      --brown:      #3A200A;
+      --mid:        #7A4A20;
+    }
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--cream);
+      color: var(--brown);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 40px rgba(80,40,0,0.13);
+      padding: 3rem 2.5rem;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .candle { font-size: 3rem; margin-bottom: 1rem; }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: var(--gold);
+      margin-bottom: 0.3rem;
+    }
+    .subtitle {
+      color: var(--mid);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Gate */
+    #gate input[type=password] {
+      width: 100%;
+      border: 1.5px solid #E8D5A8;
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      font-family: 'Lato', sans-serif;
+      color: var(--brown);
+      background: var(--gold-pale);
+      text-align: center;
+      letter-spacing: 0.15em;
+      outline: none;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+    #gate input[type=password]:focus { border-color: var(--gold); background: #fff; }
+    .gate-error {
+      color: #c0392b;
+      font-size: 0.85rem;
+      margin-top: -0.5rem;
+      margin-bottom: 0.8rem;
+      display: none;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 999px;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 0.85rem 2rem;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, #F5C842, #E8851A);
+      color: var(--brown);
+      box-shadow: 0 4px 20px rgba(240,140,0,0.35);
+    }
+    .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(240,140,0,0.5); }
+    .btn-live {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      color: #fff;
+      font-size: 1.1rem;
+      padding: 1.1rem 2rem;
+      box-shadow: 0 4px 20px rgba(192,57,43,0.35);
+      margin-bottom: 1rem;
+    }
+    .btn-live:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(192,57,43,0.5); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* Panel */
+    #panel { display: none; }
+    .panel-desc {
+      color: var(--mid);
+      font-size: 0.92rem;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+      background: var(--gold-pale);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+    }
+    .panel-desc strong { color: var(--brown); }
+
+    .status-box {
+      margin-top: 1.2rem;
+      padding: 1rem 1.2rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: none;
+    }
+    .status-box.success { background: #eafaf1; color: #1e8449; }
+    .status-box.error   { background: #fdedec; color: #c0392b; }
+
+    .subscriber-count {
+      color: var(--mid);
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+    .subscriber-count span { color: var(--gold); font-weight: 700; font-size: 1.1rem; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #F0E0C0;
+      margin: 2rem 0;
+    }
+
+    .logout {
+      margin-top: 1.5rem;
+      background: none;
+      border: none;
+      color: var(--mid);
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-decoration: underline;
+      font-family: 'Lato', sans-serif;
+    }
+    .logout:hover { color: var(--brown); }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="candle">🕯️</div>
+  <h1>Memorial Admin</h1>
+  <p class="subtitle">Anthony William Detter — Celebration of Life</p>
+
+  <!-- PASSWORD GATE -->
+  <div id="gate">
+    <input type="password" id="pw-input" placeholder="Enter password" onkeydown="if(event.key==='Enter') checkPassword()" autofocus />
+    <p class="gate-error" id="gate-error">Incorrect password — please try again.</p>
+    <button class="btn btn-gold" onclick="checkPassword()">Enter</button>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="panel">
+    <div class="subscriber-count" id="sub-count">Loading subscriber count…</div>
+
+    <div class="panel-desc">
+      Press the button below when Harry goes live on YouTube.<br />
+      <strong>Every person who signed up will receive an email immediately</strong>
+      with a link to watch at tonydetter.com.
+    </div>
+
+    <button class="btn btn-live" id="send-btn" onclick="confirmSend()">
+      🔴 Send "We're Live!" Email
+    </button>
+
+    <div class="status-box" id="status-box"></div>
+
+    <hr class="divider" />
+
+    <p style="font-size:0.8rem; color:var(--mid); line-height:1.6;">
+      Sent emails are logged in Supabase under <strong>notify_log</strong>
+      so you won't accidentally send twice.
+    </p>
+
+    <button class="logout" onclick="logout()">Sign out</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const ADMIN_PASSWORD  = 'tony2026'
+  const SUPABASE_URL    = 'https://kseotxvxpfiydywlcbrw.supabase.co'
+  const SUPABASE_KEY    = 'sb_publishable_KZ4Z1EGT-1EZySnSsV6d9Q_tryq0GjE'
+  const FUNCTION_URL    = SUPABASE_URL + '/functions/v1/send-live-notification'
+
+  const { createClient } = supabase
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+  function checkPassword() {
+    const val = document.getElementById('pw-input').value
+    if (val === ADMIN_PASSWORD) {
+      document.getElementById('gate').style.display  = 'none'
+      document.getElementById('panel').style.display = 'block'
+      loadSubscriberCount()
+    } else {
+      document.getElementById('gate-error').style.display = 'block'
+      document.getElementById('pw-input').value = ''
+      document.getElementById('pw-input').focus()
+    }
+  }
+
+  async function loadSubscriberCount() {
+    const { count } = await db.from('notify_list').select('*', { count: 'exact', head: true })
+    const el = document.getElementById('sub-count')
+    if (count === null) {
+      el.textContent = 'Could not load subscriber count.'
+    } else {
+      el.innerHTML = `<span>${count}</span> ${count === 1 ? 'person has' : 'people have'} signed up for live notifications`
+    }
+  }
+
+  function confirmSend() {
+    const ok = confirm('This will immediately email everyone on the notify list. Are you ready to go live?')
+    if (ok) sendNotification()
+  }
+
+  async function sendNotification() {
+    const btn    = document.getElementById('send-btn')
+    const status = document.getElementById('status-box')
+    btn.disabled = true
+    btn.textContent = 'Sending…'
+    status.style.display = 'none'
+
+    try {
+      const res = await fetch(FUNCTION_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json'
+        }
+      })
+      const data = await res.json()
+      if (data.success) {
+        status.className = 'status-box success'
+        status.textContent = '✓ Live notification sent to ' + data.sent + ' people!'
+        btn.textContent = '✓ Emails Sent'
+      } else {
+        throw new Error(data.error || 'Unknown error')
+      }
+    } catch (e) {
+      status.className = 'status-box error'
+      status.textContent = '✗ Error: ' + e.message
+      btn.disabled = false
+      btn.textContent = '🔴 Send "We\'re Live!" Email'
+    }
+
+    status.style.display = 'block'
+  }
+
+  function logout() {
+    document.getElementById('gate').style.display  = 'block'
+    document.getElementById('panel').style.display = 'none'
+    document.getElementById('pw-input').value = ''
+    document.getElementById('gate-error').style.display = 'none'
+  }
+</script>
+</body>
+</html>
