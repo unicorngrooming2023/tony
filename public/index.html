@@ -819,6 +819,7 @@
   <a href="#service">Service</a>
   <a href="#candles">Light a Candle</a>
   <a href="#gallery">Gallery</a>
+  <a href="#event-photos">Event Photos</a>
   <a href="#messages">Memories</a>
 </nav>
 
@@ -976,6 +977,41 @@
       <p style="font-size:0.82rem; margin-top:0.3rem; color:#AAA;">Drag &amp; drop or click · JPG, PNG or GIF · up to 20 MB</p>
       <input type="file" id="gallery-file" accept="image/*" onchange="uploadGalleryPhoto(this)" />
       <div><button class="btn-upload" onclick="event.stopPropagation(); document.getElementById('gallery-file').click()">📷 Add Your Photo</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT PHOTOS -->
+<div id="event-photos" style="background: var(--cream); max-width: 100%; padding: 4rem 1.5rem;">
+  <div class="gallery-inner">
+    <h2 class="section-title">Event Photos</h2>
+    <div class="section-rule"></div>
+    <p style="text-align:center; color:var(--mid); font-style:italic; margin-bottom:2.5rem; font-size:1rem;">
+      Photos from the Celebration of Life — June 14, 2026
+    </p>
+    <!-- Coming soon banner (hidden after event date) -->
+    <div id="event-coming-soon" style="display:none; text-align:center; padding: 2.5rem 1.5rem; background: var(--white); border-radius: 16px; box-shadow: 0 4px 24px var(--shadow); margin-bottom: 2rem;">
+      <div style="font-size:2.5rem; margin-bottom:1rem;">🕯️</div>
+      <p style="font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--gold); margin-bottom:0.5rem;">Coming Soon</p>
+      <p style="color:var(--mid); font-size:1rem; line-height:1.7;">
+        Photos from the Celebration of Life will be shared here after the event.<br>
+        Check back on <strong>June 14, 2026</strong> and beyond.
+      </p>
+    </div>
+
+    <div class="gallery-grid" id="event-gallery-grid" style="display:none"></div>
+    <div class="gallery-pagination" id="event-gallery-pagination" style="display:none">
+      <button id="event-gallery-prev" onclick="eventGalleryChangePage(-1)">← Prev</button>
+      <span class="gallery-page-info" id="event-gallery-page-info"></span>
+      <button id="event-gallery-next" onclick="eventGalleryChangePage(1)">Next →</button>
+    </div>
+    <div class="upload-box" id="event-upload-box" style="display:none" onclick="document.getElementById('event-gallery-file').click()">
+      <div class="upload-box-icon">🎉</div>
+      <div class="upload-box-title">Share a Photo from the Event</div>
+      <p>Were you there? Add your photos from the Celebration of Life.</p>
+      <p style="font-size:0.82rem; margin-top:0.3rem; color:#AAA;">Drag &amp; drop or click · JPG, PNG or GIF · up to 20 MB</p>
+      <input type="file" id="event-gallery-file" accept="image/*" onchange="uploadEventPhoto(this)" />
+      <div><button class="btn-upload" onclick="event.stopPropagation(); document.getElementById('event-gallery-file').click()">📷 Add Your Photo</button></div>
     </div>
   </div>
 </div>
@@ -1623,9 +1659,149 @@
     })
   })()
 
+  // ── Event Photos ─────────────────────────────────────────────────────────
+  let allEventPhotos = []
+  let eventGalleryPage = 1
+
+  const EVENT_DATE = new Date('2026-06-14T16:00:00') // end of event
+
+  async function loadEventGallery() {
+    const afterEvent = new Date() >= EVENT_DATE
+    const comingSoon = document.getElementById('event-coming-soon')
+    const grid       = document.getElementById('event-gallery-grid')
+    const uploadBox  = document.getElementById('event-upload-box')
+
+    if (!afterEvent) {
+      // Event hasn't happened yet — show coming soon only
+      comingSoon.style.display = 'block'
+      grid.style.display = 'none'
+      uploadBox.style.display = 'none'
+      return
+    }
+
+    // Event has passed — show grid and upload box
+    comingSoon.style.display = 'none'
+    grid.style.display = 'grid'
+    uploadBox.style.display = 'block'
+
+    const { data, error } = await db.from('event_photos').select('*').order('created_at', { ascending: false })
+    if (error || !data || !data.length) {
+      grid.innerHTML = '<p class="gallery-empty" style="grid-column:1/-1;">No event photos yet — be the first to share one!</p>'
+      document.getElementById('event-gallery-pagination').style.display = 'none'
+      return
+    }
+    allEventPhotos = data
+    eventGalleryPage = 1
+    renderEventGalleryPage()
+  }
+
+  function renderEventGalleryPage() {
+    const grid = document.getElementById('event-gallery-grid')
+    const pagination = document.getElementById('event-gallery-pagination')
+    const totalPages = Math.ceil(allEventPhotos.length / PHOTOS_PER_PAGE)
+    const start = (eventGalleryPage - 1) * PHOTOS_PER_PAGE
+    const pagePhotos = allEventPhotos.slice(start, start + PHOTOS_PER_PAGE)
+    grid.innerHTML = ''
+    pagePhotos.forEach(p => {
+      const item = document.createElement('div')
+      item.className = 'gallery-item'
+      const img = document.createElement('img')
+      img.src = p.url
+      img.loading = 'lazy'
+      img.className = 'gallery-img'
+      img.alt = 'Event photo'
+      img.onclick = () => openLightbox(p.url, p.id)
+      const btn = document.createElement('button')
+      btn.className = 'gallery-heart' + (likedPhotos.has('ev_' + p.id) ? ' liked' : '')
+      btn.innerHTML = `<span class="heart-icon">❤️</span><span class="heart-count">${p.likes || 0}</span>`
+      btn.onclick = (e) => { e.stopPropagation(); likeEventPhoto(p.id, btn) }
+      item.appendChild(img)
+      item.appendChild(btn)
+      grid.appendChild(item)
+    })
+    pagination.style.display = totalPages > 1 ? 'flex' : 'none'
+    document.getElementById('event-gallery-prev').disabled = eventGalleryPage === 1
+    document.getElementById('event-gallery-next').disabled = eventGalleryPage === totalPages
+    document.getElementById('event-gallery-page-info').textContent = `Page ${eventGalleryPage} of ${totalPages}`
+  }
+
+  async function likeEventPhoto(id, btn) {
+    const key = 'ev_' + id
+    if (likedPhotos.has(key)) return
+    likedPhotos.add(key)
+    localStorage.setItem('likedPhotos', JSON.stringify([...likedPhotos]))
+    btn.classList.add('liked')
+    const countEl = btn.querySelector('.heart-count')
+    countEl.textContent = parseInt(countEl.textContent) + 1
+    const photo = allEventPhotos.find(p => p.id === id)
+    if (photo) photo.likes = (photo.likes || 0) + 1
+    await db.rpc('increment_event_photo_likes', { photo_id: id })
+  }
+
+  function eventGalleryChangePage(dir) {
+    eventGalleryPage += dir
+    renderEventGalleryPage()
+    document.getElementById('event-photos').scrollIntoView({ behavior: 'smooth' })
+  }
+
+  async function uploadEventPhoto(input) {
+    if (!input.files[0]) return
+    showToast('Uploading photo…')
+    try {
+      const url = await uploadToStorage(input.files[0], 'event')
+      const { data, error } = await db.from('event_photos').insert({ url }).select().single()
+      if (error) throw error
+      allEventPhotos.unshift({ url: data.url, id: data.id, likes: 0 })
+      eventGalleryPage = 1
+      renderEventGalleryPage()
+      showToast('📷 Event photo added!')
+    } catch (e) {
+      showToast('Upload failed — please try again.')
+    }
+    input.value = ''
+  }
+
+  // Drag & drop for event photos
+  ;(function() {
+    const box = document.getElementById('event-upload-box')
+    if (!box) return
+    ;['dragenter','dragover'].forEach(evt => {
+      box.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); box.classList.add('drag-over') })
+    })
+    ;['dragleave','dragend'].forEach(evt => {
+      box.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); box.classList.remove('drag-over') })
+    })
+    box.addEventListener('drop', async e => {
+      e.preventDefault(); e.stopPropagation(); box.classList.remove('drag-over')
+      const file = e.dataTransfer.files[0]
+      if (!file || !file.type.startsWith('image/')) { showToast('Please drop an image file.'); return }
+      showToast('Uploading photo…')
+      try {
+        const url = await uploadToStorage(file, 'event')
+        const { data, error } = await db.from('event_photos').insert({ url }).select().single()
+        if (error) throw error
+        allEventPhotos.unshift({ url: data.url, id: data.id, likes: 0 })
+        eventGalleryPage = 1
+        renderEventGalleryPage()
+        showToast('📷 Event photo added!')
+      } catch (err) { showToast('Upload failed — please try again.') }
+    })
+  })()
+
+  // Real-time: new event photos
+  db.channel('event-photos-live')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'event_photos' }, ({ new: p }) => {
+      if (!allEventPhotos.find(x => x.id === p.id)) {
+        allEventPhotos.unshift(p)
+        if (eventGalleryPage === 1) renderEventGalleryPage()
+      }
+    })
+    .subscribe()
+
   // ── Init ────────────────────────────────────────────────────────────────
   loadCandles()
   loadGallery()
+  loadEventGallery()
   loadMessages()
 </script>
 
