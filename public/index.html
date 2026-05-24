@@ -712,10 +712,102 @@
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
 
+    /* ── EVENT BANNER ──────────────────────────────── */
+    .event-banner {
+      background: var(--brown);
+      padding: 0.95rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .event-pill {
+      background: var(--gold);
+      color: var(--gold-pale);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+    .event-title {
+      color: var(--gold-light);
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1rem;
+    }
+    .event-label {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .event-sep {
+      width: 1px;
+      height: 22px;
+      background: var(--gold);
+      opacity: 0.4;
+      flex-shrink: 0;
+    }
+    .event-detail {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: rgba(255,251,242,0.82);
+      font-size: 0.85rem;
+    }
+    .event-detail-icon {
+      font-size: 0.95rem;
+    }
+    .event-stream-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border: 1px solid rgba(200,146,42,0.5);
+      border-radius: 999px;
+      padding: 3px 12px;
+      color: var(--gold-light);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+    .event-stream-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #4ADE80;
+    }
+
+    /* ── OBITUARY ──────────────────────────────────── */
+    .obit-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 4px 24px var(--shadow);
+      font-size: 1.1rem;
+      line-height: 2;
+      color: var(--brown);
+    }
+    .obit-card p + p { margin-top: 1.2rem; }
+    .obit-survivors {
+      margin-top: 1.8rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid var(--gold-pale);
+      font-style: italic;
+      color: var(--mid);
+      font-size: 1rem;
+      line-height: 1.9;
+    }
+
     @media (max-width: 600px) {
       .form-row { flex-direction: column; }
       .gallery-grid { grid-template-columns: repeat(2, 1fr); }
       nav { gap: 1rem; font-size: 0.75rem; }
+      .event-banner { gap: 1rem; padding: 0.85rem 1.2rem; }
+      .event-sep { display: none; }
     }
   </style>
 </head>
@@ -723,10 +815,40 @@
 
 <nav>
   <a href="#tribute">Tribute</a>
+  <a href="#obituary">Obituary</a>
+  <a href="#service">Service</a>
   <a href="#candles">Light a Candle</a>
   <a href="#gallery">Gallery</a>
   <a href="#messages">Memories</a>
 </nav>
+
+<!-- EVENT BANNER -->
+<div class="event-banner">
+  <div class="event-label">
+    <span class="event-pill">Coming up</span>
+    <span class="event-title">Celebration of Life</span>
+  </div>
+  <div class="event-sep"></div>
+  <div class="event-detail">
+    <span class="event-detail-icon">📅</span>
+    Sunday, June 14, 2026
+  </div>
+  <div class="event-sep"></div>
+  <div class="event-detail">
+    <span class="event-detail-icon">🕐</span>
+    1:00 – 4:00 PM
+  </div>
+  <div class="event-sep"></div>
+  <div class="event-detail">
+    <span class="event-detail-icon">📍</span>
+    Rocky River Plantation &mdash; 2000 East River St, Anderson SC
+  </div>
+  <div class="event-sep"></div>
+  <div class="event-stream-badge">
+    <span class="event-stream-dot"></span>
+    Livestreamed
+  </div>
+</div>
 
 <!-- HERO -->
 <header class="hero">
@@ -777,6 +899,51 @@
     </p>
   </div>
 </section>
+
+<!-- OBITUARY -->
+<section id="obituary">
+  <h2 class="section-title">Obituary</h2>
+  <div class="section-rule"></div>
+  <div class="obit-card">
+    <p>
+      Born in Pittsburgh, PA, and raised in Covington, GA, Tony was a distinguished graduate of
+      Newton County High School, where he first showed the brilliance, humor, and drive that
+      would define his remarkable life. He went on to graduate Summa Cum Laude from Rhodes
+      College, where his sharp mind and magnetic personality left a lasting impression on all who
+      knew him.
+    </p>
+    <p>
+      Following his education, he built an extraordinary career. His work in international business
+      brought him to far corners of the globe, and at every stop along the way, he did what came
+      most naturally to him — he made lifelong friends.
+    </p>
+    <p>
+      Never one to slow down, he chose early retirement not to rest, but to pour his energy into the
+      things he loved most: family and racquet sports. A fierce and passionate competitor, he was a
+      devoted tennis player and an equally avid pickleball player, always the first on the court and
+      the last to leave. Whether trading volleys or trading stories courtside with the occasional
+      cocktail, he brought the same wit and warmth to every moment.
+    </p>
+    <p>
+      He was, in every sense of the word, brilliant — not just in intellect, but in spirit. His humor
+      could light up a room, his drive could move mountains, and his heart had room enough for all
+      he met. From Covington to every place his life and loves carried him, he left a piece of himself
+      with each of us fortunate enough to cross his path.
+    </p>
+    <p>
+      Ultimately, Tony was a devoted son. Caring for his mom, partnering with his father, these are
+      the roles he cherished most in the last several years.
+    </p>
+    <p class="obit-survivors">
+      Tony is survived by his father; his aunt and uncle; his beloved partner, Harry; his niece;
+      his aunt and cousins; his brother and sister-in-law; and so very many dear friends scattered
+      across every city and country his life touched.
+    </p>
+  </div>
+</section>
+
+<!-- SERVICE DETAILS ANCHOR -->
+<div id="service"></div>
 
 <!-- CANDLES -->
 <div id="candles">
