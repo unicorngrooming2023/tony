@@ -946,7 +946,7 @@
   <div class="event-sep"></div>
   <div class="event-detail">
     <span class="event-detail-icon">🕐</span>
-    1:00 – 4:00 PM
+    2:00 – 5:00 PM
   </div>
   <div class="event-sep"></div>
   <div class="event-detail">
@@ -986,7 +986,7 @@
 
 <!-- COUNTDOWN + NOTIFY -->
 <div id="countdown-section">
-  <p class="countdown-label">Celebration of Life &mdash; June 14, 2026 &mdash; 1:00 PM</p>
+  <p class="countdown-label">Celebration of Life &mdash; June 14, 2026 &mdash; 2:00 PM</p>
   <div class="countdown-grid" id="countdown-grid">
     <div class="countdown-block"><span class="countdown-num" id="cd-days">--</span><span class="countdown-unit">Days</span></div>
     <div class="countdown-block"><span class="countdown-num" id="cd-hours">--</span><span class="countdown-unit">Hours</span></div>
@@ -1791,8 +1791,8 @@
   })()
 
   // ── Countdown ────────────────────────────────────────────────────────────
-  const EVENT_START = new Date('2026-06-14T13:00:00-04:00') // 1 PM EDT
-  const EVENT_END   = new Date('2026-06-14T16:00:00-04:00') // 4 PM EDT
+  const EVENT_START = new Date('2026-06-14T14:00:00-04:00') // 2 PM EDT
+  const EVENT_END   = new Date('2026-06-14T17:00:00-04:00') // 5 PM EDT
 
   function updateCountdown() {
     const now  = new Date()
@@ -1855,7 +1855,7 @@
   let allEventPhotos = []
   let eventGalleryPage = 1
 
-  const EVENT_DATE = new Date('2026-06-14T16:00:00') // end of event
+  const EVENT_DATE = new Date('2026-06-14T17:00:00') // end of event
 
   async function loadEventGallery() {
     const afterEvent = new Date() >= EVENT_DATE
