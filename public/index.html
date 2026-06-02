@@ -728,16 +728,18 @@
       flex-wrap: wrap;
       justify-content: center;
     }
-    .birthday-banner-icon { font-size: 1.5rem; }
+    .birthday-banner-icon { font-size: 1.8rem; }
     .birthday-banner-text {
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-size: 1.05rem;
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-size: 1.2rem;
+      font-weight: 400;
       color: var(--brown);
-      line-height: 1.5;
+      line-height: 1.6;
+      letter-spacing: 0.01em;
     }
     .birthday-banner-text strong {
-      font-style: normal;
+      font-weight: 700;
       color: var(--gold);
     }
 
@@ -1062,7 +1064,7 @@
 
 <!-- COUNTDOWN + NOTIFY -->
 <div id="countdown-section">
-  <p class="countdown-label">Celebration of Life &mdash; June 14, 2026 &mdash; 2:00 PM</p>
+  <p class="countdown-label">Celebration of Life &mdash; June 14, 2026 &mdash; 2:00 PM ET (Anderson, SC)</p>
   <div class="countdown-grid" id="countdown-grid">
     <div class="countdown-block"><span class="countdown-num" id="cd-days">--</span><span class="countdown-unit">Days</span></div>
     <div class="countdown-block"><span class="countdown-num" id="cd-hours">--</span><span class="countdown-unit">Hours</span></div>
@@ -1293,9 +1295,9 @@
   <div style="margin-top:1.5rem; display:flex; justify-content:center;">
     <div class="music-player" id="music-player">
       <button class="music-btn" id="music-btn" title="Play / Pause music" onclick="toggleMusic()">▶</button>
-      <div class="music-label">
-        <strong>🎹 Chopin — Nocturne</strong>
-        Op. 9 No. 2 · Public Domain
+      <div class="music-label" id="music-label">
+        <strong id="music-title">🎹 Chopin — Nocturne</strong>
+        <span id="music-sub">Op. 9 No. 2 · Public Domain</span>
       </div>
     </div>
   </div>
@@ -1942,7 +1944,7 @@
   let allEventPhotos = []
   let eventGalleryPage = 1
 
-  const EVENT_DATE = new Date('2026-06-14T17:00:00') // end of event
+  const EVENT_DATE = new Date('2026-06-14T17:00:00-04:00') // 5 PM EDT (end of event)
 
   async function loadEventGallery() {
     const afterEvent = new Date() >= EVENT_DATE
@@ -2086,8 +2088,21 @@
 
 <!-- BACKGROUND MUSIC -->
 <audio id="bg-music" loop preload="auto" autoplay muted>
-  <source src="https://archive.org/download/chopin-nocturne-op.-9-no.-2/Chopin%20-%20Nocturne%20op.9%20No.2.mp3" type="audio/mpeg" />
+  <source id="bg-music-src" src="https://archive.org/download/chopin-nocturne-op.-9-no.-2/Chopin%20-%20Nocturne%20op.9%20No.2.mp3" type="audio/mpeg" />
 </audio>
+<script>
+  // Swap to Happy Birthday on June 2 (Tony's birthday)
+  (function() {
+    var today = new Date();
+    if (today.getMonth() === 5 && today.getDate() === 2) {
+      document.getElementById('bg-music-src').src =
+        'https://upload.wikimedia.org/wikipedia/commons/e/e5/Happy_Birthday_to_You_-_Example.ogg';
+      document.getElementById('bg-music').load();
+      document.getElementById('music-title').textContent = '🎂 Happy Birthday, Tony!';
+      document.getElementById('music-sub').textContent   = 'In loving memory · June 2';
+    }
+  })();
+</script>
 
 
 <script>
