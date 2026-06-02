@@ -1056,9 +1056,9 @@
 <!-- BIRTHDAY VIDEO (shown June 2–8 only) -->
 <div class="birthday-video-section" id="birthday-video-section">
   <p class="birthday-video-title">🎂 Happy Birthday, Tony</p>
-  <p class="birthday-video-sub">A special video in your memory — with love, this week</p>
+  <p class="birthday-video-sub">A special video in your memory — with love</p>
   <div class="birthday-video-wrapper">
-    <video controls autoplay muted playsinline preload="auto" loop>
+    <video id="birthday-video-el" controls autoplay muted playsinline preload="auto">
       <source src="birthday.mp4" type="video/mp4" />
     </video>
   </div>
@@ -2166,19 +2166,15 @@
   const btn    = document.getElementById('music-btn')
   const player = document.getElementById('music-player')
   audio.volume = 0.35
-  audio.muted  = false
 
   function setPlaying(state) {
     btn.textContent = state ? '⏸' : '▶'
     player.classList.toggle('playing', state)
   }
 
-  // Play button — always works because it's a direct user gesture
   function toggleMusic() {
     if (audio.paused) {
-      audio.play()
-        .then(() => { setPlaying(true); hideMusicPrompt() })
-        .catch(() => {})
+      audio.play().then(() => { setPlaying(true); hideMusicPrompt() }).catch(() => {})
     } else {
       audio.pause()
       setPlaying(false)
@@ -2190,30 +2186,60 @@
     if (p) p.style.display = 'none'
   }
 
-  // Auto-start on very first interaction with the page
-  let started = false
-  function autoStart() {
-    if (started) return
-    started = true
-    audio.play()
-      .then(() => { setPlaying(true); hideMusicPrompt() })
-      .catch(() => {})
-    document.removeEventListener('click',      autoStart)
-    document.removeEventListener('touchstart', autoStart)
-    document.removeEventListener('scroll',     autoStart)
-    document.removeEventListener('keydown',    autoStart)
+  function startChopin() {
+    audio.play().then(() => { setPlaying(true); hideMusicPrompt() }).catch(() => {})
   }
-  document.addEventListener('click',      autoStart)
-  document.addEventListener('touchstart', autoStart)
-  document.addEventListener('scroll',     autoStart)
-  document.addEventListener('keydown',    autoStart)
+
+  // ── Birthday mode (June 2): video plays twice with sound, then Chopin starts ──
+  const today = new Date()
+  const isBirthday = today.getMonth() === 5 && today.getDate() === 2
+  const bvid = document.getElementById('birthday-video-el')
+
+  if (isBirthday && bvid) {
+    let playCount = 0
+
+    // After each play ends: replay once, then hand off to Chopin
+    bvid.addEventListener('ended', function () {
+      playCount++
+      if (playCount < 2) {
+        bvid.currentTime = 0
+        bvid.play().catch(() => {})
+      } else {
+        startChopin()
+      }
+    })
+
+    // On first interaction: unmute the video (autoplay already started it muted)
+    let videoUnlocked = false
+    function unlockVideo() {
+      if (videoUnlocked) return
+      videoUnlocked = true
+      bvid.muted = false
+      if (bvid.paused) bvid.play().catch(() => {})
+      ;['click','touchstart','scroll','keydown'].forEach(e =>
+        document.removeEventListener(e, unlockVideo))
+    }
+    ;['click','touchstart','scroll','keydown'].forEach(e =>
+      document.addEventListener(e, unlockVideo))
+
+  } else {
+    // ── Normal mode: start Chopin on first interaction ──
+    let started = false
+    function autoStart() {
+      if (started) return
+      started = true
+      startChopin()
+      ;['click','touchstart','scroll','keydown'].forEach(e =>
+        document.removeEventListener(e, autoStart))
+    }
+    ;['click','touchstart','scroll','keydown'].forEach(e =>
+      document.addEventListener(e, autoStart))
+  }
 
   // Show "click to play" hint after 1.5 s
   setTimeout(() => {
-    if (!started) {
-      const p = document.getElementById('music-prompt')
-      if (p) p.style.display = 'inline-flex'
-    }
+    const p = document.getElementById('music-prompt')
+    if (p) p.style.display = 'inline-flex'
   }, 1500)
 </script>
 </body>
