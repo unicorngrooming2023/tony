@@ -723,6 +723,39 @@
     .toast.show { transform: translateX(-50%) translateY(0); }
 
     /* ── BIRTHDAY BANNER ──────────────────────────────── */
+    /* ── BIRTHDAY VIDEO ─────────────────────────────── */
+    .birthday-video-section {
+      display: none; /* shown via JS June 2–8 only */
+      background: linear-gradient(160deg, #3A200A 0%, #5A300F 100%);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    .birthday-video-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: var(--gold-light);
+      margin-bottom: 0.4rem;
+    }
+    .birthday-video-sub {
+      color: rgba(255,255,255,0.6);
+      font-size: 0.9rem;
+      margin-bottom: 1.8rem;
+    }
+    .birthday-video-wrapper {
+      max-width: 600px;
+      margin: 0 auto;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 48px rgba(0,0,0,0.6);
+      border: 2px solid rgba(200,146,42,0.4);
+      background: #000;
+    }
+    .birthday-video-wrapper video {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+    }
+
     .birthday-banner {
       background: linear-gradient(135deg, #FDF3DC 0%, #FFF8E8 50%, #FDF3DC 100%);
       border-top: 3px solid var(--gold);
@@ -1016,6 +1049,27 @@
         : age % 10 === 1 ? 'st' : age % 10 === 2 ? 'nd' : age % 10 === 3 ? 'rd' : 'th';
       document.getElementById('tony-age').textContent = age + suffix;
       document.getElementById('birthday-banner').style.display = 'block';
+    }
+  })();
+</script>
+
+<!-- BIRTHDAY VIDEO (shown June 2–8 only) -->
+<div class="birthday-video-section" id="birthday-video-section">
+  <p class="birthday-video-title">🎂 Happy Birthday, Tony</p>
+  <p class="birthday-video-sub">A special video in your memory — with love, this week</p>
+  <div class="birthday-video-wrapper">
+    <video controls playsinline preload="metadata">
+      <source src="birthday.mp4" type="video/mp4" />
+    </video>
+  </div>
+</div>
+<script>
+  (function() {
+    var today = new Date();
+    var m = today.getMonth(), d = today.getDate();
+    // Show June 2–8
+    if (m === 5 && d >= 2 && d <= 8) {
+      document.getElementById('birthday-video-section').style.display = 'block';
     }
   })();
 </script>
@@ -2100,7 +2154,7 @@
 </script>
 
 <!-- BACKGROUND MUSIC -->
-<audio id="bg-music" loop preload="auto" autoplay muted>
+<audio id="bg-music" loop preload="auto">
   <source id="bg-music-src" src="https://archive.org/download/chopin-nocturne-op.-9-no.-2/Chopin%20-%20Nocturne%20op.9%20No.2.mp3" type="audio/mpeg" />
 </audio>
 <script>
@@ -2109,7 +2163,7 @@
     var today = new Date();
     if (today.getMonth() === 5 && today.getDate() === 2) {
       document.getElementById('bg-music-src').src =
-        'https://upload.wikimedia.org/wikipedia/commons/e/e5/Happy_Birthday_to_You_-_Example.ogg';
+        'https://archive.org/download/happybirthdaypublicdomain/Birthday_Song.mp3';
       document.getElementById('bg-music').load();
       document.getElementById('music-title').textContent = '🎂 Happy Birthday, Tony!';
       document.getElementById('music-sub').textContent   = 'In loving memory · June 2';
@@ -2123,69 +2177,55 @@
   const btn    = document.getElementById('music-btn')
   const player = document.getElementById('music-player')
   audio.volume = 0.35
+  audio.muted  = false
 
   function setPlaying(state) {
-    if (state) {
-      btn.textContent = '⏸'
-      player.classList.add('playing')
-    } else {
-      btn.textContent = '▶'
-      player.classList.remove('playing')
-    }
+    btn.textContent = state ? '⏸' : '▶'
+    player.classList.toggle('playing', state)
   }
 
+  // Play button — always works because it's a direct user gesture
   function toggleMusic() {
     if (audio.paused) {
-      audio.muted = false
-      audio.play().then(() => setPlaying(true)).catch(() => {})
+      audio.play()
+        .then(() => { setPlaying(true); hideMusicPrompt() })
+        .catch(() => {})
     } else {
       audio.pause()
       setPlaying(false)
     }
   }
 
-  let musicStarted = false
-
-  function startMusic() {
-    if (musicStarted) return
-    musicStarted = true
-    audio.muted = false
-    audio.volume = 0.35
-    audio.play()
-      .then(() => {
-        setPlaying(true)
-        hideMusicPrompt()
-      })
-      .catch(() => {
-        setPlaying(false)
-      })
-  }
-
-  // Show a small prompt nudging the user to click for music
-  function showMusicPrompt() {
-    const prompt = document.getElementById('music-prompt')
-    if (prompt) prompt.style.display = 'inline-flex'
-  }
   function hideMusicPrompt() {
-    const prompt = document.getElementById('music-prompt')
-    if (prompt) prompt.style.display = 'none'
+    const p = document.getElementById('music-prompt')
+    if (p) p.style.display = 'none'
   }
 
-  // Browsers block autoplay with sound — wait for any user interaction
-  const unlock = (e) => {
-    startMusic()
-    document.removeEventListener('click',      unlock)
-    document.removeEventListener('touchstart', unlock)
-    document.removeEventListener('keydown',    unlock)
-    document.removeEventListener('scroll',     unlock)
+  // Auto-start on very first interaction with the page
+  let started = false
+  function autoStart() {
+    if (started) return
+    started = true
+    audio.play()
+      .then(() => { setPlaying(true); hideMusicPrompt() })
+      .catch(() => {})
+    document.removeEventListener('click',      autoStart)
+    document.removeEventListener('touchstart', autoStart)
+    document.removeEventListener('scroll',     autoStart)
+    document.removeEventListener('keydown',    autoStart)
   }
-  document.addEventListener('click',      unlock)
-  document.addEventListener('touchstart', unlock)
-  document.addEventListener('keydown',    unlock)
-  document.addEventListener('scroll',     unlock)
+  document.addEventListener('click',      autoStart)
+  document.addEventListener('touchstart', autoStart)
+  document.addEventListener('scroll',     autoStart)
+  document.addEventListener('keydown',    autoStart)
 
-  // Show prompt after a short delay so it doesn't flash on fast loads
-  setTimeout(showMusicPrompt, 1500)
+  // Show "click to play" hint after 1.5 s
+  setTimeout(() => {
+    if (!started) {
+      const p = document.getElementById('music-prompt')
+      if (p) p.style.display = 'inline-flex'
+    }
+  }, 1500)
 </script>
 </body>
 </html>
