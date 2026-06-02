@@ -549,6 +549,16 @@
       50%       { border-color: rgba(200,146,42,0.8); }
     }
     .music-player.playing { animation: music-pulse 2.5s ease-in-out infinite; }
+    .music-prompt {
+      display: none;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.7rem;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.55);
+      animation: music-pulse 2s ease-in-out infinite;
+      cursor: default;
+    }
 
     /* ── FOOTER ────────────────────────────────── */
     footer {
@@ -1293,12 +1303,15 @@
     </span>
   </p>
   <div style="margin-top:1.5rem; display:flex; justify-content:center;">
+    <div style="display:flex; flex-direction:column; align-items:center;">
     <div class="music-player" id="music-player">
       <button class="music-btn" id="music-btn" title="Play / Pause music" onclick="toggleMusic()">▶</button>
       <div class="music-label" id="music-label">
         <strong id="music-title">🎹 Chopin — Nocturne</strong>
         <span id="music-sub">Op. 9 No. 2 · Public Domain</span>
       </div>
+    </div>
+    <span class="music-prompt" id="music-prompt">🎵 Click anywhere to play music</span>
     </div>
   </div>
 </footer>
@@ -2131,31 +2144,48 @@
     }
   }
 
-  // Unmute immediately — audio element already has autoplay+muted so it starts playing.
-  // We just need to unmute it right away.
+  let musicStarted = false
+
   function startMusic() {
+    if (musicStarted) return
+    musicStarted = true
     audio.muted = false
     audio.volume = 0.35
-    if (audio.paused) {
-      audio.play().catch(() => {})
-    }
-    setPlaying(true)
+    audio.play()
+      .then(() => {
+        setPlaying(true)
+        hideMusicPrompt()
+      })
+      .catch(() => {
+        setPlaying(false)
+      })
   }
 
-  // Try to unmute instantly on load
-  audio.addEventListener('canplaythrough', startMusic, { once: true })
+  // Show a small prompt nudging the user to click for music
+  function showMusicPrompt() {
+    const prompt = document.getElementById('music-prompt')
+    if (prompt) prompt.style.display = 'inline-flex'
+  }
+  function hideMusicPrompt() {
+    const prompt = document.getElementById('music-prompt')
+    if (prompt) prompt.style.display = 'none'
+  }
 
-  // Also try immediately in case it's already loaded
-  if (audio.readyState >= 3) startMusic()
-
-  // Final fallback: first interaction
-  const unlock = () => {
+  // Browsers block autoplay with sound — wait for any user interaction
+  const unlock = (e) => {
     startMusic()
-    document.removeEventListener('click', unlock)
+    document.removeEventListener('click',      unlock)
     document.removeEventListener('touchstart', unlock)
+    document.removeEventListener('keydown',    unlock)
+    document.removeEventListener('scroll',     unlock)
   }
-  document.addEventListener('click', unlock)
+  document.addEventListener('click',      unlock)
   document.addEventListener('touchstart', unlock)
+  document.addEventListener('keydown',    unlock)
+  document.addEventListener('scroll',     unlock)
+
+  // Show prompt after a short delay so it doesn't flash on fast loads
+  setTimeout(showMusicPrompt, 1500)
 </script>
 </body>
 </html>
