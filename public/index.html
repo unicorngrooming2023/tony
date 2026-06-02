@@ -712,6 +712,35 @@
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
 
+    /* ── BIRTHDAY BANNER ──────────────────────────────── */
+    .birthday-banner {
+      background: linear-gradient(135deg, #FDF3DC 0%, #FFF8E8 50%, #FDF3DC 100%);
+      border-top: 3px solid var(--gold);
+      border-bottom: 3px solid var(--gold-light);
+      padding: 0.9rem 2rem;
+      text-align: center;
+      display: none; /* shown via JS on June 2 only */
+    }
+    .birthday-banner-inner {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .birthday-banner-icon { font-size: 1.5rem; }
+    .birthday-banner-text {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--brown);
+      line-height: 1.5;
+    }
+    .birthday-banner-text strong {
+      font-style: normal;
+      color: var(--gold);
+    }
+
     /* ── EVENT BANNER ──────────────────────────────── */
     .event-banner {
       background: var(--brown);
@@ -931,6 +960,30 @@
   <a href="#event-photos">Event Photos</a>
   <a href="#messages">Memories</a>
 </nav>
+
+<!-- BIRTHDAY BANNER (shown June 2 only) -->
+<div class="birthday-banner" id="birthday-banner">
+  <div class="birthday-banner-inner">
+    <span class="birthday-banner-icon">🎂</span>
+    <p class="birthday-banner-text" id="birthday-banner-text">
+      Today would have been <strong>Tony's <span id="tony-age"></span> birthday</strong> — June 2nd.
+      Holding him in our hearts a little extra today.
+    </p>
+    <span class="birthday-banner-icon">🎂</span>
+  </div>
+</div>
+<script>
+  (function() {
+    var today = new Date();
+    if (today.getMonth() === 5 && today.getDate() === 2) { // month is 0-indexed; 5 = June
+      var age = today.getFullYear() - 1967;
+      var suffix = age === 11 ? 'th' : age === 12 ? 'th' : age === 13 ? 'th'
+        : age % 10 === 1 ? 'st' : age % 10 === 2 ? 'nd' : age % 10 === 3 ? 'rd' : 'th';
+      document.getElementById('tony-age').textContent = age + suffix;
+      document.getElementById('birthday-banner').style.display = 'block';
+    }
+  })();
+</script>
 
 <!-- EVENT BANNER -->
 <div class="event-banner">
