@@ -2155,20 +2155,9 @@
 
 <!-- BACKGROUND MUSIC -->
 <audio id="bg-music" loop preload="auto">
-  <source id="bg-music-src" src="https://archive.org/download/chopin-nocturne-op.-9-no.-2/Chopin%20-%20Nocturne%20op.9%20No.2.mp3" type="audio/mpeg" />
+  <source src="https://archive.org/download/chopin-nocturne-op.-9-no.-2/Chopin%20-%20Nocturne%20op.9%20No.2.mp3" type="audio/mpeg" />
 </audio>
 <script>
-  // Swap to Happy Birthday on June 2 (Tony's birthday)
-  (function() {
-    var today = new Date();
-    if (today.getMonth() === 5 && today.getDate() === 2) {
-      document.getElementById('bg-music-src').src =
-        'https://archive.org/download/happybirthdaypublicdomain/Birthday_Song.mp3';
-      document.getElementById('bg-music').load();
-      document.getElementById('music-title').textContent = '🎂 Happy Birthday, Tony!';
-      document.getElementById('music-sub').textContent   = 'In loving memory · June 2';
-    }
-  })();
 </script>
 
 
