@@ -1147,16 +1147,6 @@
     </iframe>
   </div>
   <p class="yt-embed-label">📺 The livestream will begin here on June 14, 2026 at 2:00 PM &nbsp;·&nbsp; <a href="https://www.youtube.com/watch?v=1FQn4xaU7WI" target="_blank" rel="noopener" style="color:var(--gold-light); text-decoration:underline; text-underline-offset:3px;">Watch directly on YouTube ↗</a></p>
-
-  <div class="notify-box" id="notify-box">
-    <p class="notify-title">🔔 Get notified when we go live</p>
-    <p class="notify-sub">Enter your email and we'll let you know the moment the stream starts.</p>
-    <div class="notify-row">
-      <input class="notify-input" id="notify-email" type="email" placeholder="your@email.com" />
-      <button class="notify-btn" id="notify-btn" onclick="submitNotify()">Notify me</button>
-    </div>
-    <p class="notify-confirm" id="notify-confirm">✓ You're on the list — we'll email you when we go live.</p>
-  </div>
 </div>
 
 <!-- TRIBUTE -->
@@ -1956,20 +1946,17 @@
 
     const grid      = document.getElementById('countdown-grid')
     const liveMsg   = document.getElementById('countdown-live')
-    const notifyBox = document.getElementById('notify-box')
 
     if (now >= EVENT_START && now < EVENT_END) {
       // Event is live right now
       grid.style.display    = 'none'
       liveMsg.style.display = 'block'
-      notifyBox.style.display = 'none'
       return
     }
 
     if (now >= EVENT_END) {
       // Event is over
       grid.style.display    = 'none'
-      notifyBox.style.display = 'none'
       document.getElementById('countdown-section').style.display = 'none'
       return
     }
@@ -1988,24 +1975,6 @@
 
   updateCountdown()
   setInterval(updateCountdown, 1000)
-
-  // ── Notify ───────────────────────────────────────────────────────────────
-  async function submitNotify() {
-    const email = document.getElementById('notify-email').value.trim()
-    if (!email || !email.includes('@')) { showToast('Please enter a valid email address.'); return }
-    const btn = document.getElementById('notify-btn')
-    btn.disabled = true
-    btn.textContent = 'Saving…'
-    const { error } = await db.from('notify_list').insert({ email })
-    if (error) {
-      // If already signed up, still show confirmation
-      document.getElementById('notify-confirm').style.display = 'block'
-    } else {
-      document.getElementById('notify-confirm').style.display = 'block'
-    }
-    document.getElementById('notify-email').style.display = 'none'
-    btn.style.display = 'none'
-  }
 
   // ── Event Photos ─────────────────────────────────────────────────────────
   let allEventPhotos = []
