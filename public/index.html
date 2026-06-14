@@ -1140,13 +1140,14 @@
   <!-- YouTube Livestream Embed -->
   <div class="yt-embed-wrapper">
     <iframe
-      src="https://www.youtube.com/embed/blY1ZJYqvnk"
+      id="yt-livestream"
+      src="https://www.youtube.com/embed/blY1ZJYqvnk?enablejsapi=1"
       title="Celebration of Life — Anthony William Detter"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
       allowfullscreen>
     </iframe>
   </div>
-  <p class="yt-embed-label">📺 The livestream will begin here on June 14, 2026 at 2:00 PM &nbsp;·&nbsp; <a href="https://www.youtube.com/watch?v=blY1ZJYqvnk" target="_blank" rel="noopener" style="color:var(--gold-light); text-decoration:underline; text-underline-offset:3px;">Watch directly on YouTube ↗</a></p>
+  <p class="yt-embed-label">▶ Click the play button above to begin watching once the service is live &nbsp;·&nbsp; <a href="https://www.youtube.com/watch?v=blY1ZJYqvnk" target="_blank" rel="noopener" style="color:var(--gold-light); text-decoration:underline; text-underline-offset:3px;">Watch directly on YouTube ↗</a></p>
 </div>
 
 <!-- TRIBUTE -->
@@ -2210,6 +2211,42 @@
     const p = document.getElementById('music-prompt')
     if (p) p.style.display = 'inline-flex'
   }, 1500)
+
+  // ── Pause Chopin when the livestream starts ──
+  // Loads the YouTube IFrame API and watches the embed. As soon as the
+  // livestream begins playing, the background music fades out and pauses
+  // so it doesn't clash with the service audio.
+  function fadeOutMusic() {
+    if (audio.paused) { setPlaying(false); return }
+    const step = audio.volume / 12
+    const fade = setInterval(() => {
+      if (audio.volume > step) {
+        audio.volume = Math.max(0, audio.volume - step)
+      } else {
+        audio.pause()
+        audio.volume = 0.35   // reset for later manual replay
+        setPlaying(false)
+        clearInterval(fade)
+      }
+    }, 120)
+  }
+
+  ;(function loadYTApi() {
+    const tag = document.createElement('script')
+    tag.src = 'https://www.youtube.com/iframe_api'
+    document.body.appendChild(tag)
+  })()
+
+  window.onYouTubeIframeAPIReady = function () {
+    new YT.Player('yt-livestream', {
+      events: {
+        onStateChange: function (e) {
+          // 1 = playing
+          if (e.data === YT.PlayerState.PLAYING) fadeOutMusic()
+        }
+      }
+    })
+  }
 </script>
 </body>
 </html>
