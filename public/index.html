@@ -908,8 +908,12 @@
 
     /* ── YOUTUBE EMBED ──────────────────────────────── */
     .yt-embed-wrapper {
-      max-width: 760px;
+      position: relative;
+      width: 100%;
+      max-width: 430px;
       margin: 2rem auto 0;
+      padding-bottom: 177.78%; /* portrait 9:16 frame for the rotated video */
+      height: 0;
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 8px 48px rgba(0,0,0,0.5);
@@ -917,10 +921,14 @@
       background: #000;
     }
     .yt-embed-wrapper iframe {
-      display: block;
-      width: 100%;
-      aspect-ratio: 16 / 9;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 177.78%;
+      height: 56.25%;
       border: none;
+      transform: translate(-50%, -50%) rotate(-90deg);
+      transform-origin: center center;
     }
     .yt-embed-label {
       color: rgba(255,255,255,0.6);
@@ -1141,13 +1149,13 @@
   <div class="yt-embed-wrapper">
     <iframe
       id="yt-livestream"
-      src="https://www.youtube.com/embed/pu5npN01ysw?enablejsapi=1"
+      src="https://www.youtube.com/embed/sKaUbCApwjU?enablejsapi=1"
       title="Celebration of Life — Anthony William Detter"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
       allowfullscreen>
     </iframe>
   </div>
-  <p class="yt-embed-label">▶ Click the play button above to begin watching once the service is live &nbsp;·&nbsp; <a href="https://www.youtube.com/watch?v=pu5npN01ysw" target="_blank" rel="noopener" style="color:var(--gold-light); text-decoration:underline; text-underline-offset:3px;">Watch directly on YouTube ↗</a></p>
+  <p class="yt-embed-label">▶ Click the play button above to begin watching once the service is live &nbsp;·&nbsp; <a href="https://www.youtube.com/watch?v=sKaUbCApwjU" target="_blank" rel="noopener" style="color:var(--gold-light); text-decoration:underline; text-underline-offset:3px;">Watch directly on YouTube ↗</a></p>
 </div>
 
 <!-- TRIBUTE -->
