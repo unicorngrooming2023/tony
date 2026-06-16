@@ -908,12 +908,8 @@
 
     /* ── YOUTUBE EMBED ──────────────────────────────── */
     .yt-embed-wrapper {
-      position: relative;
-      width: 100%;
-      max-width: 430px;
+      max-width: 760px;
       margin: 2rem auto 0;
-      padding-bottom: 177.78%; /* portrait 9:16 frame for the rotated video */
-      height: 0;
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 8px 48px rgba(0,0,0,0.5);
@@ -921,14 +917,10 @@
       background: #000;
     }
     .yt-embed-wrapper iframe {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 177.78%;
-      height: 56.25%;
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
       border: none;
-      transform: translate(-50%, -50%) rotate(-90deg);
-      transform-origin: center center;
     }
     .yt-embed-label {
       color: rgba(255,255,255,0.6);
@@ -1083,33 +1075,6 @@
 </script>
 
 <!-- EVENT BANNER -->
-<div class="event-banner">
-  <div class="event-label">
-    <span class="event-pill">Coming up</span>
-    <span class="event-title">Celebration of Life</span>
-  </div>
-  <div class="event-sep"></div>
-  <div class="event-detail">
-    <span class="event-detail-icon">📅</span>
-    Sunday, June 14, 2026
-  </div>
-  <div class="event-sep"></div>
-  <div class="event-detail">
-    <span class="event-detail-icon">🕐</span>
-    2:00 – 5:00 PM
-  </div>
-  <div class="event-sep"></div>
-  <div class="event-detail">
-    <span class="event-detail-icon">📍</span>
-    Rocky River Plantation &mdash; 2000 East River St, Anderson SC
-  </div>
-  <div class="event-sep"></div>
-  <div class="event-stream-badge">
-    <span class="event-stream-dot"></span>
-    Livestreamed
-  </div>
-</div>
-
 <!-- HERO -->
 <header class="hero">
   <div class="portrait-ring">
@@ -1136,15 +1101,6 @@
 
 <!-- COUNTDOWN + NOTIFY -->
 <div id="countdown-section">
-  <p class="countdown-label">Celebration of Life &mdash; June 14, 2026 &mdash; 2:00 PM ET (Anderson, SC)</p>
-  <div class="countdown-grid" id="countdown-grid">
-    <div class="countdown-block"><span class="countdown-num" id="cd-days">--</span><span class="countdown-unit">Days</span></div>
-    <div class="countdown-block"><span class="countdown-num" id="cd-hours">--</span><span class="countdown-unit">Hours</span></div>
-    <div class="countdown-block"><span class="countdown-num" id="cd-mins">--</span><span class="countdown-unit">Minutes</span></div>
-    <div class="countdown-block"><span class="countdown-num" id="cd-secs">--</span><span class="countdown-unit">Seconds</span></div>
-  </div>
-  <p class="countdown-live" id="countdown-live">🔴 The service is live right now!</p>
-
   <!-- YouTube Livestream Embed -->
   <div class="yt-embed-wrapper">
     <iframe
@@ -1944,46 +1900,6 @@
       }
     })
   })()
-
-  // ── Countdown ────────────────────────────────────────────────────────────
-  const EVENT_START = new Date('2026-06-14T14:00:00-04:00') // 2 PM EDT
-  const EVENT_END   = new Date('2026-06-14T17:00:00-04:00') // 5 PM EDT
-
-  function updateCountdown() {
-    const now  = new Date()
-    const diff = EVENT_START - now
-
-    const grid      = document.getElementById('countdown-grid')
-    const liveMsg   = document.getElementById('countdown-live')
-
-    if (now >= EVENT_START && now < EVENT_END) {
-      // Event is live right now
-      grid.style.display    = 'none'
-      liveMsg.style.display = 'block'
-      return
-    }
-
-    if (now >= EVENT_END) {
-      // Event is over
-      grid.style.display    = 'none'
-      document.getElementById('countdown-section').style.display = 'none'
-      return
-    }
-
-    // Count down to event
-    const days  = Math.floor(diff / 86400000)
-    const hours = Math.floor((diff % 86400000) / 3600000)
-    const mins  = Math.floor((diff % 3600000)  / 60000)
-    const secs  = Math.floor((diff % 60000)    / 1000)
-
-    document.getElementById('cd-days').textContent  = String(days).padStart(2, '0')
-    document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0')
-    document.getElementById('cd-mins').textContent  = String(mins).padStart(2, '0')
-    document.getElementById('cd-secs').textContent  = String(secs).padStart(2, '0')
-  }
-
-  updateCountdown()
-  setInterval(updateCountdown, 1000)
 
   // ── Event Photos ─────────────────────────────────────────────────────────
   let allEventPhotos = []
