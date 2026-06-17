@@ -1121,7 +1121,10 @@
   .program-intro { text-align: center; color: #6b5836; max-width: 540px; margin: 0 auto 1.8rem; font-size: 1rem; }
   #program-book-wrap { display: flex; align-items: center; justify-content: center; width: 100%; }
   #program-book { touch-action: none; }
-  #program-book .stf__item, #program-book img { box-shadow: 0 4px 18px var(--shadow); }
+  #program-book .stf__item { box-shadow: 0 4px 18px var(--shadow); }
+  #program-book .page { background:#fff; width:100%; height:100%; }
+  #program-book .page img { width:100%; height:100%; display:block; object-fit:cover; }
+  #program-book, #program-book .stf__wrapper, #program-book .stf__block, #program-book .stf__item.--simple { background-color: transparent !important; }
   .program-controls { display: flex; gap: .6rem; justify-content: center; margin-top: 1.5rem; }
   .program-controls button {
     font-family: inherit; font-size: .9rem; color: var(--gold);
@@ -1152,16 +1155,36 @@
     function build(){
       el.innerHTML = '';
       var ratio = 1750/1125;
-      var avail = Math.min(wrap.clientWidth || window.innerWidth, 760);
-      var pageW = Math.min(avail, 560);
+      var single = window.innerWidth < 760;
+      var avail = Math.min(wrap.clientWidth || window.innerWidth, single ? 760 : 1240);
+      var pageW = single ? Math.min(avail, 560) : Math.min(avail/2, 470);
       var pageH = pageW * ratio;
       var maxH = window.innerHeight - 150;
       if(pageH > maxH){ pageH = maxH; pageW = pageH/ratio; }
+      var dens = ['hard','soft','soft','hard'];
+      var phtml = '';
+      for(var n=0; n<images.length; n++){
+        phtml += '<div class="page" data-density="'+dens[n]+'"><img src="'+images[n]+'" alt=""></div>';
+      }
+      el.innerHTML = phtml;
       pf = new St.PageFlip(el, {
         width: pageW, height: pageH, size: 'fixed', showCover: true,
-        maxShadowOpacity: 0.5, mobileScrollSupport: true, usePortrait: true
+        maxShadowOpacity: 0.5, mobileScrollSupport: true, usePortrait: single
       });
-      pf.loadFromImages(images);
+      pf.loadFromHTML(el.querySelectorAll('.page'));
+      el.style.transition = 'transform .45s ease';
+      function centerCover(){
+        if(single){ el.style.transform = ''; return; }
+        var idx = pf.getCurrentPageIndex();
+        var last = pf.getPageCount() - 1;
+        var shift = 0;
+        if(idx <= 0){ shift = -(pageW/2); }          // front cover: pull left to center
+        else if(idx >= last){ shift = (pageW/2); }   // back cover: push right to center
+        el.style.transform = 'translateX(' + shift + 'px)';
+      }
+      pf.on('flip', centerCover);
+      pf.on('changeState', centerCover);
+      setTimeout(centerCover, 60);
       document.getElementById('program-prev').onclick = function(){ pf.flipPrev(); };
       document.getElementById('program-next').onclick = function(){ pf.flipNext(); };
     }
