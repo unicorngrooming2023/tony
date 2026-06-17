@@ -1234,6 +1234,41 @@
 })();
 </script>
 
+<!-- EVENT PHOTOS -->
+<div id="event-photos" style="background: var(--cream); max-width: 100%; padding: 4rem 1.5rem;">
+  <div class="gallery-inner">
+    <h2 class="section-title">Event Photos</h2>
+    <div class="section-rule"></div>
+    <p style="text-align:center; color:var(--mid); font-style:italic; margin-bottom:2.5rem; font-size:1rem;">
+      Photos from the Celebration of Life — June 14, 2026
+    </p>
+    <!-- Coming soon banner (hidden after event date) -->
+    <div id="event-coming-soon" style="display:none; text-align:center; padding: 2.5rem 1.5rem; background: var(--white); border-radius: 16px; box-shadow: 0 4px 24px var(--shadow); margin-bottom: 2rem;">
+      <div style="font-size:2.5rem; margin-bottom:1rem;">🕯️</div>
+      <p style="font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--gold); margin-bottom:0.5rem;">Coming Soon</p>
+      <p style="color:var(--mid); font-size:1rem; line-height:1.7;">
+        Photos from the Celebration of Life will be shared here after the event.<br>
+        Check back on <strong>June 14, 2026</strong> and beyond.
+      </p>
+    </div>
+
+    <div class="gallery-grid" id="event-gallery-grid" style="display:none"></div>
+    <div class="gallery-pagination" id="event-gallery-pagination" style="display:none">
+      <button id="event-gallery-prev" onclick="eventGalleryChangePage(-1)">← Prev</button>
+      <span class="gallery-page-info" id="event-gallery-page-info"></span>
+      <button id="event-gallery-next" onclick="eventGalleryChangePage(1)">Next →</button>
+    </div>
+    <div class="upload-box" id="event-upload-box" style="display:none" onclick="document.getElementById('event-gallery-file').click()">
+      <div class="upload-box-icon">🎉</div>
+      <div class="upload-box-title">Share a Photo from the Event</div>
+      <p>Were you there? Add your photos from the Celebration of Life.</p>
+      <p style="font-size:0.82rem; margin-top:0.3rem; color:#AAA;">Drag &amp; drop or click · JPG, PNG or GIF · up to 20 MB</p>
+      <input type="file" id="event-gallery-file" accept="image/*" onchange="uploadEventPhoto(this)" />
+      <div><button class="btn-upload" onclick="event.stopPropagation(); document.getElementById('event-gallery-file').click()">📷 Add Your Photo</button></div>
+    </div>
+  </div>
+</div>
+
 <!-- TRIBUTE -->
 <section id="tribute">
   <h2 class="section-title">A Life to Celebrate</h2>
@@ -1336,41 +1371,6 @@
       <p style="font-size:0.82rem; margin-top:0.3rem; color:#AAA;">Drag &amp; drop or click · JPG, PNG or GIF · up to 20 MB</p>
       <input type="file" id="gallery-file" accept="image/*" onchange="uploadGalleryPhoto(this)" />
       <div><button class="btn-upload" onclick="event.stopPropagation(); document.getElementById('gallery-file').click()">📷 Add Your Photo</button></div>
-    </div>
-  </div>
-</div>
-
-<!-- EVENT PHOTOS -->
-<div id="event-photos" style="background: var(--cream); max-width: 100%; padding: 4rem 1.5rem;">
-  <div class="gallery-inner">
-    <h2 class="section-title">Event Photos</h2>
-    <div class="section-rule"></div>
-    <p style="text-align:center; color:var(--mid); font-style:italic; margin-bottom:2.5rem; font-size:1rem;">
-      Photos from the Celebration of Life — June 14, 2026
-    </p>
-    <!-- Coming soon banner (hidden after event date) -->
-    <div id="event-coming-soon" style="display:none; text-align:center; padding: 2.5rem 1.5rem; background: var(--white); border-radius: 16px; box-shadow: 0 4px 24px var(--shadow); margin-bottom: 2rem;">
-      <div style="font-size:2.5rem; margin-bottom:1rem;">🕯️</div>
-      <p style="font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--gold); margin-bottom:0.5rem;">Coming Soon</p>
-      <p style="color:var(--mid); font-size:1rem; line-height:1.7;">
-        Photos from the Celebration of Life will be shared here after the event.<br>
-        Check back on <strong>June 14, 2026</strong> and beyond.
-      </p>
-    </div>
-
-    <div class="gallery-grid" id="event-gallery-grid" style="display:none"></div>
-    <div class="gallery-pagination" id="event-gallery-pagination" style="display:none">
-      <button id="event-gallery-prev" onclick="eventGalleryChangePage(-1)">← Prev</button>
-      <span class="gallery-page-info" id="event-gallery-page-info"></span>
-      <button id="event-gallery-next" onclick="eventGalleryChangePage(1)">Next →</button>
-    </div>
-    <div class="upload-box" id="event-upload-box" style="display:none" onclick="document.getElementById('event-gallery-file').click()">
-      <div class="upload-box-icon">🎉</div>
-      <div class="upload-box-title">Share a Photo from the Event</div>
-      <p>Were you there? Add your photos from the Celebration of Life.</p>
-      <p style="font-size:0.82rem; margin-top:0.3rem; color:#AAA;">Drag &amp; drop or click · JPG, PNG or GIF · up to 20 MB</p>
-      <input type="file" id="event-gallery-file" accept="image/*" onchange="uploadEventPhoto(this)" />
-      <div><button class="btn-upload" onclick="event.stopPropagation(); document.getElementById('event-gallery-file').click()">📷 Add Your Photo</button></div>
     </div>
   </div>
 </div>
