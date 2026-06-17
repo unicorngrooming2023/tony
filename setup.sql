@@ -19,6 +19,13 @@ CREATE TABLE IF NOT EXISTS gallery_photos (
   created_at timestamptz DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS event_photos (
+  id         uuid        DEFAULT gen_random_uuid() PRIMARY KEY,
+  url        text        NOT NULL,
+  likes      int         DEFAULT 0,
+  created_at timestamptz DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS candles (
   id    int  PRIMARY KEY DEFAULT 1,
   count int  DEFAULT 0
@@ -31,6 +38,7 @@ INSERT INTO candles (id, count) VALUES (1, 0) ON CONFLICT DO NOTHING;
 
 ALTER TABLE messages       ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gallery_photos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE event_photos   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE candles        ENABLE ROW LEVEL SECURITY;
 
 -- Messages
@@ -40,6 +48,10 @@ CREATE POLICY "Public insert messages" ON messages       FOR INSERT WITH CHECK (
 -- Gallery
 CREATE POLICY "Public read gallery"    ON gallery_photos FOR SELECT USING (true);
 CREATE POLICY "Public insert gallery"  ON gallery_photos FOR INSERT WITH CHECK (true);
+
+-- Event Photos
+CREATE POLICY "Public read event_photos"   ON event_photos FOR SELECT USING (true);
+CREATE POLICY "Public insert event_photos" ON event_photos FOR INSERT WITH CHECK (true);
 
 -- Candles
 CREATE POLICY "Public read candles"    ON candles        FOR SELECT USING (true);
@@ -66,8 +78,14 @@ RETURNS void AS $$
   UPDATE candles SET count = count + 1 WHERE id = 1;
 $$ LANGUAGE sql SECURITY DEFINER;
 
+CREATE OR REPLACE FUNCTION increment_event_photo_likes(photo_id uuid)
+RETURNS void AS $$
+  UPDATE event_photos SET likes = likes + 1 WHERE id = photo_id;
+$$ LANGUAGE sql SECURITY DEFINER;
+
 -- ── Real-time ────────────────────────────────────────────────
 
 ALTER PUBLICATION supabase_realtime ADD TABLE messages;
 ALTER PUBLICATION supabase_realtime ADD TABLE gallery_photos;
+ALTER PUBLICATION supabase_realtime ADD TABLE event_photos;
 ALTER PUBLICATION supabase_realtime ADD TABLE candles;
