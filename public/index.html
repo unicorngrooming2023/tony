@@ -1015,6 +1015,45 @@
       .event-banner { gap: 1rem; padding: 0.85rem 1.2rem; }
       .event-sep { display: none; }
     }
+
+    /* ── MOBILE FRIENDLY ───────────────────────── */
+    @media (max-width: 760px) {
+      body { font-size: 17px; }
+
+      /* Single-row, swipeable nav so all links stay reachable */
+      nav {
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 1.25rem;
+        padding: 0.6rem 1rem;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      nav::-webkit-scrollbar { display: none; }
+      nav a { white-space: nowrap; flex: 0 0 auto; }
+
+      /* Tighter vertical rhythm + smaller side gutters */
+      section { padding: 2.75rem 1.2rem; }
+      .hero { padding: 3rem 1.2rem 3.5rem; }
+      #gallery, #event-photos, #candles {
+        padding-left: 1.2rem; padding-right: 1.2rem;
+        padding-top: 2.75rem; padding-bottom: 2.75rem;
+      }
+      #program { padding: 2.5rem 0.6rem; }
+      .tribute-card { padding: 1.7rem 1.4rem; }
+
+      /* Portrait keeps its shape but scales to the screen */
+      .portrait-ring { width: min(280px, 72vw); height: auto; aspect-ratio: 320 / 420; }
+    }
+
+    @media (max-width: 440px) {
+      body { font-size: 16px; }
+      .section-title { font-size: 1.7rem; }
+      .tribute-card { font-size: 1.05rem; line-height: 1.8; }
+      .portrait-ring { width: min(240px, 68vw); }
+      .candle-flame { font-size: 1.9rem; }
+    }
   </style>
 </head>
 <body>
