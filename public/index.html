@@ -1115,6 +1115,66 @@
   </div>
 </div>
 
+<!-- MEMORIAL PROGRAM (flippable booklet) -->
+<style>
+  #program { background: var(--gold-pale); max-width: 100%; padding: 4rem 1.5rem; }
+  .program-intro { text-align: center; color: #6b5836; max-width: 540px; margin: 0 auto 1.8rem; font-size: 1rem; }
+  #program-book-wrap { display: flex; align-items: center; justify-content: center; width: 100%; }
+  #program-book { touch-action: none; }
+  #program-book .stf__item, #program-book img { box-shadow: 0 4px 18px var(--shadow); }
+  .program-controls { display: flex; gap: .6rem; justify-content: center; margin-top: 1.5rem; }
+  .program-controls button {
+    font-family: inherit; font-size: .9rem; color: var(--gold);
+    background: var(--white); border: 1px solid var(--gold-light);
+    border-radius: 999px; padding: .55rem 1.4rem; cursor: pointer; transition: .15s;
+  }
+  .program-controls button:hover { background: var(--gold); color: #fff; }
+</style>
+<section id="program">
+  <h2 class="section-title">Memorial Program</h2>
+  <div class="section-rule"></div>
+  <p class="program-intro">The printed program — drag a page corner to turn it, or use the arrows below.</p>
+  <div id="program-book-wrap"><div id="program-book"></div></div>
+  <div class="program-controls">
+    <button id="program-prev">← Previous</button>
+    <button id="program-next">Next →</button>
+  </div>
+</section>
+<script>
+(function(){
+  function init(){
+    if(!window.St || !St.PageFlip){ return setTimeout(init, 200); }
+    var wrap = document.getElementById('program-book-wrap');
+    var el = document.getElementById('program-book');
+    if(!wrap || !el) return;
+    var images = ['program/cover.jpg','program/obituary.jpg','program/order.jpg','program/back.jpg'];
+    var pf;
+    function build(){
+      el.innerHTML = '';
+      var ratio = 1750/1125;
+      var single = window.innerWidth < 700;
+      var avail = Math.min(wrap.clientWidth || window.innerWidth, 1240);
+      var pageW = single ? Math.min(avail, 520) : Math.min(avail/2, 600);
+      var pageH = pageW * ratio;
+      var maxH = window.innerHeight - 160;
+      if(pageH > maxH){ pageH = maxH; pageW = pageH/ratio; }
+      pf = new St.PageFlip(el, {
+        width: pageW, height: pageH, size: 'fixed', showCover: true,
+        maxShadowOpacity: 0.5, mobileScrollSupport: true, usePortrait: single
+      });
+      pf.loadFromImages(images);
+      document.getElementById('program-prev').onclick = function(){ pf.flipPrev(); };
+      document.getElementById('program-next').onclick = function(){ pf.flipNext(); };
+    }
+    build();
+    var rt;
+    window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(build, 250); });
+  }
+  if(document.readyState !== 'loading'){ init(); }
+  else { document.addEventListener('DOMContentLoaded', init); }
+})();
+</script>
+
 <!-- TRIBUTE -->
 <section id="tribute">
   <h2 class="section-title">A Life to Celebrate</h2>
@@ -1177,66 +1237,6 @@
     </p>
   </div>
 </section>
-
-<!-- MEMORIAL PROGRAM (flippable booklet) -->
-<style>
-  #program { background: var(--gold-pale); max-width: 100%; padding: 4rem 1.5rem; }
-  .program-intro { text-align: center; color: #6b5836; max-width: 540px; margin: 0 auto 1.8rem; font-size: 1rem; }
-  #program-book-wrap { display: flex; align-items: center; justify-content: center; width: 100%; }
-  #program-book { touch-action: none; }
-  #program-book .stf__item, #program-book img { box-shadow: 0 4px 18px var(--shadow); }
-  .program-controls { display: flex; gap: .6rem; justify-content: center; margin-top: 1.5rem; }
-  .program-controls button {
-    font-family: inherit; font-size: .9rem; color: var(--gold);
-    background: var(--white); border: 1px solid var(--gold-light);
-    border-radius: 999px; padding: .55rem 1.4rem; cursor: pointer; transition: .15s;
-  }
-  .program-controls button:hover { background: var(--gold); color: #fff; }
-</style>
-<section id="program">
-  <h2 class="section-title">Memorial Program</h2>
-  <div class="section-rule"></div>
-  <p class="program-intro">The printed program — drag a page corner to turn it, or use the arrows below.</p>
-  <div id="program-book-wrap"><div id="program-book"></div></div>
-  <div class="program-controls">
-    <button id="program-prev">← Previous</button>
-    <button id="program-next">Next →</button>
-  </div>
-</section>
-<script>
-(function(){
-  function init(){
-    if(!window.St || !St.PageFlip){ return setTimeout(init, 200); }
-    var wrap = document.getElementById('program-book-wrap');
-    var el = document.getElementById('program-book');
-    if(!wrap || !el) return;
-    var images = ['program/cover.png','program/obituary.png','program/order.png','program/back.png'];
-    var pf;
-    function build(){
-      el.innerHTML = '';
-      var ratio = 1750/1125;
-      var single = window.innerWidth < 700;
-      var avail = Math.min(wrap.clientWidth || window.innerWidth, 1100);
-      var pageW = single ? Math.min(avail, 460) : Math.min(avail/2, 520);
-      var pageH = pageW * ratio;
-      var maxH = window.innerHeight - 160;
-      if(pageH > maxH){ pageH = maxH; pageW = pageH/ratio; }
-      pf = new St.PageFlip(el, {
-        width: pageW, height: pageH, size: 'fixed', showCover: true,
-        maxShadowOpacity: 0.5, mobileScrollSupport: true, usePortrait: single
-      });
-      pf.loadFromImages(images);
-      document.getElementById('program-prev').onclick = function(){ pf.flipPrev(); };
-      document.getElementById('program-next').onclick = function(){ pf.flipNext(); };
-    }
-    build();
-    var rt;
-    window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(build, 250); });
-  }
-  if(document.readyState !== 'loading'){ init(); }
-  else { document.addEventListener('DOMContentLoaded', init); }
-})();
-</script>
 
 <!-- SERVICE DETAILS ANCHOR -->
 <div id="service"></div>
