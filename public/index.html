@@ -1152,15 +1152,14 @@
     function build(){
       el.innerHTML = '';
       var ratio = 1750/1125;
-      var single = window.innerWidth < 700;
-      var avail = Math.min(wrap.clientWidth || window.innerWidth, 1240);
-      var pageW = single ? Math.min(avail, 520) : Math.min(avail/2, 600);
+      var avail = Math.min(wrap.clientWidth || window.innerWidth, 760);
+      var pageW = Math.min(avail, 560);
       var pageH = pageW * ratio;
-      var maxH = window.innerHeight - 160;
+      var maxH = window.innerHeight - 150;
       if(pageH > maxH){ pageH = maxH; pageW = pageH/ratio; }
       pf = new St.PageFlip(el, {
         width: pageW, height: pageH, size: 'fixed', showCover: true,
-        maxShadowOpacity: 0.5, mobileScrollSupport: true, usePortrait: single
+        maxShadowOpacity: 0.5, mobileScrollSupport: true, usePortrait: true
       });
       pf.loadFromImages(images);
       document.getElementById('program-prev').onclick = function(){ pf.flipPrev(); };
